@@ -11,6 +11,13 @@ Adapted from # cdsw-2020 https://wiki.communitydata.science/Seattle_open_data
 
 **License / terms of use:** Public Domain
 
+**AI Statement: (Detailed Notes under Answers)** 
+- For Q1, I had help with AI to figure out how to plot 4 different lines and specific range of time onto the graph.
+- For Q2, I had help with AI to make 4 subplots that could show both cyclist and pedestrian activity.
+- For Q3, I had help with AI to create a graph that could seperate weekdays from weekends and show activity for cyclists and pedestrians.
+- For Q4, I did not use AI
+
+
 ## Questions I asked
 
 **Q1. When is the trail busiest, and when is it quietest?**

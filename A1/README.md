@@ -12,10 +12,10 @@ Adapted from # cdsw-2020 https://wiki.communitydata.science/Seattle_open_data
 **License / terms of use:** Public Domain
 
 **AI Statement (Detailed Notes under Answers):** 
-- For Q1, I had help with AI to figure out how to plot 4 different lines and a specific range of time onto the graph.
-- For Q2, I had help with AI to make 4 subplots that could show both cyclist and pedestrian activity.
-- For Q3, I had help with AI to create a graph that could separate weekdays from weekends and show activity for cyclists and pedestrians.
-- For Q4, I did not use AI
+- **Q1:** I had help with AI to figure out how to plot 4 different lines and a specific range of time onto the graph.
+- **Q2:** I had help with AI to make 4 subplots that could show both cyclist and pedestrian activity.
+- **Q3:** I had help with AI to create a graph that could separate weekdays from weekends and show activity for cyclists and pedestrians.
+- **Q4**: I did not use AI
 
 ---
 
@@ -23,11 +23,11 @@ Adapted from # cdsw-2020 https://wiki.communitydata.science/Seattle_open_data
 
 ### **Q1. When is the trail busiest, and when is it quietest?**
 
-- Decide what *busy* means to you first — a single hour? a stretch of the day? bikes and peds together, or separately? — and say why you chose that.
+-Decide what *busy* means to you first — a single hour? a stretch of the day? bikes and peds together, or separately? — and say why you chose that.
 
 ### **My Q1 answer:**
 
--*I decided to model when the trail is busiest by using four stretches of a day in 6-hour intervals to identify which stretch of the day is busiest. I combined bikes and pedestrians because they both contribute to how busy or how much traffic the trail has at a certain hour. With the graph, the hour when traffic is busiest is during the afternoon from 12pm-5pm, and when it is quietest during dawn from 0am-5am. This makes sense in context, because most people are sleeping from 0am-5am so they would not be on the trail, and most people would already be outside 12pm-5pm when the sun is still up, making it the busiest time to use the trail in comparison to the morning or evening.*
+- *I decided to model when the trail is busiest by using four stretches of a day in 6-hour intervals to identify which stretch of the day is busiest. I combined bikes and pedestrians because they both contribute to how busy or how much traffic the trail has at a certain hour. With the graph, the hour when traffic is busiest is during the afternoon from 12pm-5pm, and when it is quietest during dawn from 0am-5am. This makes sense in context, because most people are sleeping from 0am-5am so they would not be on the trail, and most people would already be outside 12pm-5pm when the sun is still up, making it the busiest time to use the trail in comparison to the morning or evening.*
 
 ***AI Prompt**: How do I show 6-hour intervals on a plot using panda for jupyter notebook if I have by_hour = df.groundpy("hour")["people"].sum()*
 
@@ -112,7 +112,7 @@ plt.show()
 
 - *Based on the graph, there is more traffic on the weekend compared to weekdays. The "commuting pattern" tells us that many cyclists use the trail for commuting on weekdays, due to the peak in activity during the morning and evening, with few pedestrians who use the trail for commuting. Additionally, the "commuting pattern" shows that more cyclists use the trail for fun on the weekends compared to weekdays because of the amount of sustained traffic in the afternoon, and pedestrian traffic also shows that pedestrians are using the trail for morning walks while cyclists tend to use it throughout the day. This would mean that the Burke-Gilman Trail is more popular among cyclists for recreational use on the weekends and is primarily used for commuting on the weekdays, while pedestrians use it recreationally only in the morning on weekends and barely use it on the weekdays.*
 
-***AI Prompt:** How could I compare bikes and pedestrians by weekday vs. weekends by hour? There is a weekday variable that shows strings of the week *
+***AI Prompt:** How could I compare bikes and pedestrians by weekday vs. weekends by hour? There is a weekday variable that shows strings of the week.*
 
 ***AI Original Output:***
 ```

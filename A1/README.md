@@ -1,7 +1,4 @@
-#HCDE410
-Files for HCDE410 - Assignment A1
-
-Adapted from # cdsw-2020 https://wiki.communitydata.science/Seattle_open_data
+# HCDE410
 
 # A1 — Working with Open Data
 
@@ -27,9 +24,9 @@ Adapted from # cdsw-2020 https://wiki.communitydata.science/Seattle_open_data
 
 ### **My Q1 answer:**
 
-- *I decided to model when the trail is busiest by using four stretches of a day in 6-hour intervals to identify which stretch of the day is busiest. I combined bikes and pedestrians because they both contribute to how busy or how much traffic the trail has at a certain hour. With the graph, the hour when traffic is busiest is during the afternoon from 12pm-5pm, and when it is quietest during dawn from 0am-5am. This makes sense in context, because most people are sleeping from 0am-5am so they would not be on the trail, and most people would already be outside 12pm-5pm when the sun is still up, making it the busiest time to use the trail in comparison to the morning or evening.*
+- *I divided the day into four six-hour periods to compare total traffic at different times of day and combined bike and pedestrian counts because both contribute to overall traffic use. Based on the graph, the afternoon (12pm-5pm) has the highest total traffic, while dawn(12 AM-5AM) has the lowest. I believe this makes sense in context because most people are sleeping at dawn, so they would not be on the trail, and most people would already be outside during the afternoon when the sun is still up, making it a more convenient time to use the trail in comparison to the morning or evening.*
 
-***AI Prompt**: How do I show 6-hour intervals on a plot using panda for jupyter notebook if I have by_hour = df.groundpy("hour")["people"].sum()*
+***AI Prompt**: How do I show 6-hour intervals on a plot using panda for jupyter notebook if I have by_hour = df.groundpy("hour")["people"].sum() Should I use a bar chart to better interpret this?* 
 
 ***AI Original Output:***
 
@@ -54,7 +51,34 @@ plt.xticks(range(1, 7))
 plt.show()
 ```
 
-***What I changed:** I labeled the intervals to show the corresponding hours so that it would be easier to understand the time the intervals take place in*
+Yeah, I think a bar chart is better for Q1 if your goal is to identify which six-hour period has the most total trail traffic. It directly compares the total counts across the four periods, whereas your original line graph shows hourly patterns within each period
+
+```
+df["people"] = df["bikes"] + df["peds"]
+
+by_hour = df.groupby("hour")["people"].sum()
+
+periods = {
+    "Dawn (12 AM–5 AM)": (0, 5),
+    "Morning (6 AM–11 AM)": (6, 11),
+    "Afternoon (12 PM–5 PM)": (12, 17),
+    "Evening (6 PM–11 PM)": (18, 23)
+}
+
+period_totals = {
+    name: by_hour.loc[start:end].sum()
+    for name, (start, end) in periods.items()
+}
+
+pd.Series(period_totals).plot(kind="bar", figsize=(10, 5))
+plt.title("Total Burke-Gilman Trail Traffic by Time of Day (2019)")
+plt.xlabel("Time of Day")
+plt.ylabel("Total Bike and Pedestrian Count")
+plt.xticks(rotation=0)
+plt.show()
+```
+
+***What I changed:** I changed this graph two times, from a line chart to a bar chart to better show the timeframe with most traffic. I originally labeled the intervals to show the corresponding hours so that it would be easier to understand the time the intervals take place in and then for the second version I labeled the y-axis to show that it was a total count*
 
 ---
 ### **Q2. Do cyclists and pedestrians use the trail at different times of day?**
@@ -63,7 +87,7 @@ plt.show()
 
 ### **My Q2 answer:**
 
-- *I split it up into 4 subplots to help visualize the comparisons of cyclists vs. pedestrians for each stretch of time and it seems there are a lot more cyclists using the trail throughout the day than pedestrians. There is an increase during the morning for cyclists, which continues to increase until the evening, while pedestrians increase during the morning but start to slightly decrease in the afternoon. My hypothesis on why they differ is that the Burke-Gillman trail is primarily used by cyclists throughout the day, and that some pedestrians only use the trail in the morning, but there could be other routes pedestrians are using to get home later in the day.*
+- *The graphs show differences in the hourly patterns of cyclists and pedestrians, where cyclists have higher recorded counts than pedestrians. Cyclist counts decrease during the morning and continue to rise into the evening, while pedestrian counts increase in the morning and decline somewhat in the afternoon. One possible explanation is that cyclists and pedestrians use the trail for different purposes; for example, pedestrians may only use the trail in the morning, but use other routes to get home later in the day. However, the data alone can't exactly show why these patterns occur.*
 
 ***AI Prompt:** Based on previous prompt, show me how I could split these periods for "bike" vs "peds" to make 4 plots and show each interval of time. How can I make the x ticks correlate with the hour? How do I make the y-axis start from 0?*
 
@@ -110,7 +134,7 @@ plt.show()
 
 ### **My Q3 answer:**
 
-- *Based on the graph, there is more traffic on the weekend compared to weekdays. The "commuting pattern" tells us that many cyclists use the trail for commuting on weekdays, due to the peak in activity during the morning and evening, with few pedestrians who use the trail for commuting. Additionally, the "commuting pattern" shows that more cyclists use the trail for fun on the weekends compared to weekdays because of the amount of sustained traffic in the afternoon, and pedestrian traffic also shows that pedestrians are using the trail for morning walks while cyclists tend to use it throughout the day. This would mean that the Burke-Gilman Trail is more popular among cyclists for recreational use on the weekends and is primarily used for commuting on the weekdays, while pedestrians use it recreationally only in the morning on weekends and barely use it on the weekdays.*
+- *I looked at the morning and evening peaks on weekdays for cyclists and pedestrians as possible evidence of commuting, and higher, sustained daytime traffic on weekends for cyclists and a peak of activity during the morning for pedestrians as possible evidence of recreational use. The weekday and weekend graphs show differences in traffic patterns, where the trail has higher counts on the weekend, which could suggest that the trail is used for different purposes across the week, but more people use it during the weekend. However, the limitation is that the interpretation of traffic activity can't distinguish commuting from recreational use because the dataset doesn't record the reason why people are using the trail or where they're going.*
 
 ***AI Prompt:** How could I compare bikes and pedestrians by weekday vs. weekends by hour? There is a weekday variable that shows strings of the week.*
 
@@ -153,7 +177,7 @@ fig.suptitle("Average Bike and Pedestrian Traffic by Hour: Weekdays vs. Weekends
 plt.tight_layout()
 plt.show()
 ```
-***What I changed:** I adjusted the titles for the graphs to be more accurate and specific to what data is being shown in each plot so that it was easier to understand what is being graphed. It originally only wrote "Bike/Pedestrian Traffic by Hour" and didn't specify the year or the range of hours in the axes titles. I also removed the dots on each hour to make it look cleaner.* 
+***What I changed:** I adjusted the titles for the graphs to be more accurate and specific to what data is being shown in each plot so that it was easier to understand what is being graphed. It originally only wrote "Bike/Pedestrian Traffic by Hour" and didn't specify the year or the range of hours in the axes titles. I also simplified the code for calculating the mean*
 
 ---
 ### **Q4. Direction and flow.**
@@ -162,14 +186,14 @@ plt.show()
 
 ### **My Q4 answer:**
 
-- *Based on the graphs, on weekdays, a majority of traffic comes from cyclists using the trail to travel north in the morning and travel south in the evening, while pedestrians travel both directions in the morning and evening. On weekends, both directions of activity match up with Q3, where cyclists use it throughout the day, and pedestrians use it in the morning. The map of the Burke-Gilman trail shows that the south is near the University of Washington and the north goes all the way to Bothell, where there are more workplace buildings. I hypothesize that cyclists who live near the University of Washington are the majority using the trail to commute to work, with few pedestrians using the trail on weekdays, while many cyclists in general use the trail for fun throughout the day, with pedestrians using the trail for morning walks on the weekends; this is also supported by my previous answers to Q1-Q3.*
+- *Based on the graphs, on weekdays, a majority of traffic comes from cyclists using the trail, who seem to travel north in the morning and travel south in the evening. On weekends, traffic appears to be distributed throughout the day for cyclists, which may be consistent with recreational use from Q3, and it also shows that pedestrian activity peaks in the morning. The map of the Burke-Gilman trail shows that the south is near the University of Washington and the north goes all the way to Bothell, where there are more workplace buildings. I hypothesize that on the weekdays, a majority of this traffic may come from cyclists who live near the University of Washington and use the trail to commute to work, with few pedestrians using the trail, while on the weekends, many cyclists in general use the trail for fun throughout the day, with pedestrians using the trail for morning walks; this is also supported by my previous answers to Q1-Q3.*
 
 ***AI Prompt**: No AI prompt was used for this question, I rewrote the code from previous questions to better fit the question here*
 
 ---
 ### **Limitations or bias of the data**
 
-- *One bias this dataset could have that could mislead someone is if the people on the trail went back and forth on the trail multiple times. This could skew the data, making counts of cyclists or pedestrians higher than they were in reality. This would mislead my hypothesis about more cyclists using the trail on the weekends than weekdays.*
+- *One bias this dataset is that the counters only record passages near the cameras rather than individuals. This could mislead someone if people using the trail went back and forth multiple times. This could affect the interpretations of the data, particularly trail use and busiest hours, making counts of cyclists or pedestrians higher than they were in reality and would mislead my hypothesis about more cyclists using the trail on the weekends than weekdays. Another limitation this dataset has is that it does not record the purposes of travel, so the motivation behind traffic can only be predicted by the patterns rather than insights*
 
 ---
 ## How to re-run

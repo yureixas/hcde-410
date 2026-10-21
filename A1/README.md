@@ -87,7 +87,7 @@ plt.show()
 
 ### **My Q2 answer:**
 
-- *The graphs show differences in the hourly patterns of cyclists and pedestrians, where cyclists have higher recorded counts than pedestrians. Cyclist counts decrease during the morning and continue to rise into the evening, while pedestrian counts increase in the morning and decline somewhat in the afternoon. One possible explanation is that cyclists and pedestrians use the trail for different purposes; for example, pedestrians may only use the trail in the morning, but use other routes to get home later in the day. However, the data alone can't exactly show why these patterns occur.*
+- *The graphs show differences in the hourly patterns of cyclists and pedestrians, where cyclists have higher recorded counts than pedestrians. Cyclist counts decrease during the morning and continue to rise into the evening, while pedestrian counts increase in the morning and decline during the afternoon. One possible explanation for this pattern could be that cyclists and pedestrians use the trail for different purposes; for example, pedestrians may only use the trail in the morning, but use other routes to get home later in the day. However, the data alone can't exactly show why these patterns occur.*
 
 ***AI Prompt:** Based on previous prompt, show me how I could split these periods for "bike" vs "peds" to make 4 plots and show each interval of time. How can I make the x ticks correlate with the hour? How do I make the y-axis start from 0?*
 
@@ -134,7 +134,7 @@ plt.show()
 
 ### **My Q3 answer:**
 
-- *I looked at the morning and evening peaks on weekdays for cyclists and pedestrians as possible evidence of commuting, and higher, sustained daytime traffic on weekends for cyclists and a peak of activity during the morning for pedestrians as possible evidence of recreational use. The weekday and weekend graphs show differences in traffic patterns, where the trail has higher counts on the weekend, which could suggest that the trail is used for different purposes across the week, but more people use it during the weekend. However, the limitation is that the interpretation of traffic activity can't distinguish commuting from recreational use because the dataset doesn't record the reason why people are using the trail or where they're going.*
+- *To define a "commuting pattern", I looked at morning and evening peaks on weekdays for cyclists and lower amount of traffic from pedestrians as possible evidence of commuting to work. Higher, sustained daytime traffic on weekends for cyclists and a morning peak for pedestrians may suggest recreational use as more traffic is recorded. These "commuting" patterns could indicate that people use the trail for different purposes throughout the week, and I hypothesize that higher activity is correlated with more available free time, making recreational use more likely, while lower sustained activity on weekdays shows how people use the trail during their workdays. However, this is only a hypothesis because the dataset doesn't record why people use the trail or where they're going.*
 
 ***AI Prompt:** How could I compare bikes and pedestrians by weekday vs. weekends by hour? There is a weekday variable that shows strings of the week.*
 
@@ -177,7 +177,7 @@ fig.suptitle("Average Bike and Pedestrian Traffic by Hour: Weekdays vs. Weekends
 plt.tight_layout()
 plt.show()
 ```
-***What I changed:** I adjusted the titles for the graphs to be more accurate and specific to what data is being shown in each plot so that it was easier to understand what is being graphed. It originally only wrote "Bike/Pedestrian Traffic by Hour" and didn't specify the year or the range of hours in the axes titles. I also simplified the code for calculating the mean*
+***What I changed:** I adjusted the titles for the graphs to be more accurate and specific to what data is being shown in each plot so that it was easier to understand what is being graphed. It originally only wrote "Bike/Pedestrian Traffic by Hour" and didn't specify the year or the range of hours in the axes titles. I also corrected the code to accurately calculate the mean as the AI wrote it wrong*
 
 ---
 ### **Q4. Direction and flow.**
@@ -186,7 +186,8 @@ plt.show()
 
 ### **My Q4 answer:**
 
-- *Based on the graphs, on weekdays, a majority of traffic comes from cyclists using the trail, who seem to travel north in the morning and travel south in the evening. On weekends, traffic appears to be distributed throughout the day for cyclists, which may be consistent with recreational use from Q3, and it also shows that pedestrian activity peaks in the morning. The map of the Burke-Gilman trail shows that the south is near the University of Washington and the north goes all the way to Bothell, where there are more workplace buildings. I hypothesize that on the weekdays, a majority of this traffic may come from cyclists who live near the University of Washington and use the trail to commute to work, with few pedestrians using the trail, while on the weekends, many cyclists in general use the trail for fun throughout the day, with pedestrians using the trail for morning walks; this is also supported by my previous answers to Q1-Q3.*
+- *Some patterns that emerged from the graphs are that, on weekdays, most traffic comes from cyclists, who appear to travel north in the morning and south in the evening. On weekends, cyclist traffic in both directions appears to be distributed throughout the day, while pedestrian traffic in both directions peaks in the morning which are consistent with some of the differences in trail use I observed in Q3. When looking at the map of the Burke-Gilman Trail, the southern section is near the University of Washington, while the trail extends north toward Bothell, where there are workplace buildings. Based on this context, I hypothesize that some cyclists may use the trail to commute to work on weekdays, with the direction of travel potentially reflecting their commute and on weekends, pedestrians may be using these paths for morning recreational walks. These hypotheses are consistent with my previous observations in Q1–Q3, but the data does not explicitly show or tell where people are going or why they use the trail and if my assumptions from the map match up.*
+
 
 ***AI Prompt**: No AI prompt was used for this question, I rewrote the code from previous questions to better fit the question here*
 

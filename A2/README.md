@@ -11,8 +11,7 @@
 **License / terms of use:** CC0 1.0 Universal (Public Domain)
 
 **AI Statement:** 
-- I used AI for Q5-6. The detailed responses (including prompt, output, what I changed) are found below each corresponding answer.
-
+- I did use AI to help with coding this assignment. Check the 'Usage of AI' section below for a more detailed report
 
 ## 2.1 Questions and Answers (Descriptive Statistics)
 
@@ -32,11 +31,90 @@ The largest age group reported was 18–30, with 2,911 workers (50.35%), followe
 
 The most common education level reported was a bachelor's degree, representing 2,303 workers (39.84%), followed by high school with 1,657 (28.66%), master's degrees with 931 (16.10%), professional degrees with 684 (11.83%), some education with 141 (2.44%), and doctorate degrees with 61 (1.06%). The least common category reported was “none,” with 4 workers (0.07%), indicating no education level.
 
-**Q5.** Analyze all_annotators in Sheets or Jupyter: Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?
+**Q5** The dataset contains a missing field in the age group category, where 112 workers have a missing age group value (1.94% of the rows). Earlier, I wasn't sure what this missing field meant, even when discussing the distribution in Q3. Missing field information like that can affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
 
-The dataset contains a missing field in the age group category, where 112 workers have a missing age group value (1.94% of the rows). Earlier, I wasn't sure what this missing field meant, even when discussing the distribution in Q3. Missing field information like that can affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
+**Q6**
+Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is inaccurate and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
 
-- **AI prompt:** Use the Python pandas library to create a table that could show missing values or empty cells in a dataset. This is supposed to help answer "Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?" For reference, this is how one of the tables is being formatted:
+**Q7**
+I believe that the demographics of the annotators do not fully represent English-speaking internet users overall. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of English content than actual content online from other languages, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
+
+**Q8**
+I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because the majority of annotators reported English as their first language, their judgments and evaluation of hostile speech may not fully reflect or identify how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset.
+
+
+
+
+## Usage of AI:
+### Q1-Q4 AI Statement:
+I reused code generated from AI in Q7 and adjusted it to add bar graphs. Originally, there were only tables. Then I used the prompt below to make the bar graphs better to read
+
+**AI Prompt:** How do I sort data on a bar chart? Also how to the bar chart horizontal?
+
+**AI Output**
+
+You can use .sort_values() to sort the bars and .plot.barh() to make the chart horizontal.
+1. Sort bars from highest to lowest
+Add .sort_values(ascending=False) before plotting:
+
+```
+language_sorted = langugage_table.sort_values(
+    by="Number of Workers",
+    ascending=False
+)
+
+ax = language_sorted["Number of Workers"].plot.bar(
+    xlabel="English First Language",
+    ylabel="Number of Workers",
+    legend=False
+)
+
+plt.title("Workers by Language")
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+```
+2. Make the bar chart horizontal
+Change .plot.bar() to .plot.barh():
+```
+ax = language_sorted["Number of Workers"].plot.barh(
+    xlabel="Number of Workers",
+    ylabel="English First Language",
+    legend=False
+)
+
+plt.title("Workers by Language")
+plt.tight_layout()
+plt.show()
+```
+3. Add percentages to horizontal bars
+Since the bars are horizontal, percentages go at the right end of each bar.
+```
+ax = language_sorted["Number of Workers"].plot.barh(
+    xlabel="Number of Workers",
+    ylabel="English First Language",
+    legend=False
+)
+
+for i, percentage in enumerate(language_sorted["Percentage (%)"]):
+    ax.text(
+        language_sorted["Number of Workers"].iloc[i],
+        i,
+        f"{percentage}%",
+        va="center",
+        ha="left"
+    )
+
+plt.title("Workers by language")
+plt.tight_layout()
+plt.show()
+```
+
+**What I changed** I adjusted this code so that it could be used for each bar chart when necessary (Like if there are more than 5 categories, I would make the bar chart horizontal)
+
+### Q5 - AI Statement:
+**AI prompt:** Use the Python pandas library to create a table that could show missing values or empty cells in a dataset. This is supposed to help answer "Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?" For reference, this is how one of the tables is being formatted:
 ```
 by_gender = df.groupby("gender").size()
 
@@ -50,8 +128,7 @@ gender_data = {
 gender_table = pd.DataFrame(data=gender_data)
 display(gender_table)
 ```
-
-- **AI Output:**
+**AI Output:**
 ```
 #Treat empty cells as missing values
 df_check = df.replace(r'^\s*$', pd.NA, regex=True)
@@ -67,17 +144,13 @@ missing_table = pd.DataFrame({
 
 display(missing_table)
 ```
-
-- **What I changed:** For this question, I wasn't sure how to code how to check empty cells so I didn't change the code that the AI gave me as it already worked as intended. From this, I was able to identify any missing fields the dataset had.
-
-
-**Q6.** Build a version of the all_annotators dataset *without removing duplicates*, then re-run the summary statistics from questions 1-4. How have these summary statistics changed?
-
-Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is inaccurate and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
+**What I changed:** For this question, I wasn't sure how to code how to check empty cells so I didn't change the code that the AI gave me as it already worked as intended. From this, I was able to identify any missing fields the dataset had.
 
 
-- **AI Prompt:** Help me figure out how I could create a dataset that contains all toxicity_annotators, attack_annotators, and aggression_annotators in one dataset. Each of them contain a dataset reference that corresponds to each worker/annotator, and I need to figure out how I can create an all_annotators list that keeps duplicates based on this code: 
-```
+### Q6 - AI Statement:
+
+**AI Prompt:** Help me figure out how I could create a dataset that contains all toxicity_annotators, attack_annotators, and aggression_annotators in one dataset. Each of them contain a dataset reference that corresponds to each worker/annotator, and I need to figure out how I can create an all_annotators list that keeps duplicates based on this code: 
+
 def finalize_dataset(list1, list2):
     
     #combine the two lists into a new one
@@ -102,11 +175,8 @@ all_annotators = finalize_dataset(toxicity_annotators, attack_aggro_annotators)
 print(len(all_annotators))
 print(all_annotators[0])
 
-```
+**AI Output:**
 
-- **AI Output:**
-
-```
 datasets_with_duplicates = [
     ("toxicity", toxicity_annotators),
     ("attack", attack_annotators),
@@ -125,8 +195,66 @@ df_duplicates = pd.DataFrame(rows_with_duplicates)
 
 print("Original dataset rows:", len(df))
 print("Dataset rows with duplicates:", len(df_duplicates))
-```
-- **What I changed:** I changed the name of some of the variables so I could better understand what it meant.
 
+**What I changed:** I changed the name of some of the variables so I could better understand what it meant.
+
+
+### Q7 - AI Statement:
+
+**AI Prompt:** How to show percentages on top of the bars and how to label each bar? This is how I am formatting the table:
+```
+by_language = df.groupby("english_first_language").size()
+
+language_percentage = (by_language / by_language.sum() * 100).round(2)
+
+language_data = {
+    "Number of Workers": by_language,
+    "Percentage %": language_percentage
+}
+language_table = pd.DataFrame(data= language_data)
+display(language_table)
+```
+
+**AI Output:** 
+```
+# Calculate worker counts and percentages
+by_language = df.groupby("english_first_language").size()
+language_percentage = (by_language / by_language.sum() * 100).round(2)
+
+# Rename categories
+language_table = pd.DataFrame({
+    "Number of Workers": by_language,
+    "Percentage (%)": language_percentage
+})
+
+language_table.index = language_table.index.map({
+    "0": "Not First Language",
+    "1": "First Language"
+})
+
+# Create bar chart
+ax = language_table["Number of Workers"].plot.bar(
+    xlabel="English First Language",
+    ylabel="Number of Workers",
+    legend=False
+)
+
+# Add percentages above bars
+for i, percentage in enumerate(language_table["Percentage (%)"]):
+    ax.text(
+        i,
+        language_table["Number of Workers"].iloc[i],
+        f"{percentage}%",
+        ha="center",
+        va="bottom"
+    )
+
+plt.title("Workers by First Language")
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+```
+
+**What I changed** I adjusted this code to correctly label the bar chart, as 0 as not English wasn't accurate. I also tweaked the code for that it was showing both the table and bar chart.
 
 *Exercises and assignments for HCDE410: Human Data Interaction. Everything here is a work in progress unless otherwise noted :)*

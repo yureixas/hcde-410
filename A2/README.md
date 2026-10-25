@@ -31,18 +31,33 @@ The largest age group reported was 18–30, with 2,911 workers (50.35%), followe
 
 The most common education level reported was a bachelor's degree, representing 2,303 workers (39.84%), followed by high school with 1,657 (28.66%), master's degrees with 931 (16.10%), professional degrees with 684 (11.83%), some education with 141 (2.44%), and doctorate degrees with 61 (1.06%). The least common category reported was “none,” with 4 workers (0.07%), indicating no education level.
 
-**Q5** The dataset contains a missing field in the age group category, where 112 workers have a missing age group value (1.94% of the rows). Earlier, I wasn't sure what this missing field meant, even when discussing the distribution in Q3. Missing field information like that can affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
+## 2.2 
 
-**Q6**
-Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is inaccurate and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
+**Q5.** Analyze all_annotators in Sheets or Jupyter: Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?
 
-**Q7**
-I believe that the demographics of the annotators do not fully represent English-speaking internet users overall. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of English content than actual content online from other languages, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
+- The dataset contains a missing field in the age group category, where 112 workers have a missing age group value (1.94% of the rows). Earlier, I wasn't sure what this missing field meant, even when discussing the distribution in Q3. Missing field information like that can affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
 
-**Q8**
-I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because the majority of annotators reported English as their first language, their judgments and evaluation of hostile speech may not fully reflect or identify how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset.
+**Q6.** Build a version of the all_annotators dataset *without removing duplicates*, then re-run the summary statistics from questions 1-4. How have these summary statistics changed?
+
+- Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is inaccurate and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
 
 
+**Q7.** In general, how do the demographics of these workers compare to those of English-speaking internet users overall? Why would it matter if the worker demographics don't match the demographics of the intended end users of the Perspective API?
+
+- I believe that the demographics of the annotators do not fully represent English-speaking internet users overall. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of English content than actual content online from other languages, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
+
+
+**Q8.** Given what you now know about the Wikipedia Talk Corpus, what issues might arise if it was used to train a machine learning-driven "hostile speech detector" that could be used on any website or social media platform?
+
+- I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because the majority of annotators reported English as their first language, their judgments and evaluation of hostile speech may not fully reflect or identify how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset.
+
+## 3.1
+
+#### Code questions
+- **Q9.** What % of *workers* who labelled the toxicity dataset do we have demographic data for?
+- **Q10.** What % of the *comments* in the toxicity dataset were labelled by male vs. female-identified workers?
+- **Q11.** What % of the *comments* in the toxicity dataset were labelled by people for whom English is NOT their first language?
+- **Q12.** Based on your findings from questions 9-11, how might this dataset present a biased view of "toxicity"? How would you expect such biases to impact how the Perspective API performs? 
 
 
 ## Usage of AI:
@@ -150,7 +165,7 @@ display(missing_table)
 ### Q6 - AI Statement:
 
 **AI Prompt:** Help me figure out how I could create a dataset that contains all toxicity_annotators, attack_annotators, and aggression_annotators in one dataset. Each of them contain a dataset reference that corresponds to each worker/annotator, and I need to figure out how I can create an all_annotators list that keeps duplicates based on this code: 
-
+```
 def finalize_dataset(list1, list2):
     
     #combine the two lists into a new one
@@ -174,9 +189,9 @@ all_annotators = finalize_dataset(toxicity_annotators, attack_aggro_annotators)
 #print the list length and a sample, for sanity-checking purposes
 print(len(all_annotators))
 print(all_annotators[0])
-
+```
 **AI Output:**
-
+```
 datasets_with_duplicates = [
     ("toxicity", toxicity_annotators),
     ("attack", attack_annotators),
@@ -195,7 +210,7 @@ df_duplicates = pd.DataFrame(rows_with_duplicates)
 
 print("Original dataset rows:", len(df))
 print("Dataset rows with duplicates:", len(df_duplicates))
-
+```
 **What I changed:** I changed the name of some of the variables so I could better understand what it meant.
 
 

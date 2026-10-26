@@ -35,43 +35,45 @@ The most common education level reported was a bachelor's degree, representing 2
 
 **Q5.** Analyze all_annotators in Sheets or Jupyter: Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?
 
-- The dataset contains a missing field in the age group category, where 112 workers have a missing age group value (1.94% of the rows). Earlier, I wasn't sure what this missing field meant, even when discussing the distribution in Q3. Missing field information like that can affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
+- The age_group field has 112 missing values, which represents 1.94% of the rows. Earlier, I wasn't sure what this missing field meant in the bar chart, even when discussing the distribution in Q3. This means this dataset has **incomplete data**, which could affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
 
 **Q6.** Build a version of the all_annotators dataset *without removing duplicates*, then re-run the summary statistics from questions 1-4. How have these summary statistics changed?
 
-- Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is inaccurate and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
+- Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset, which is an example of **duplicated data**. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is now distorted and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
 
 
 **Q7.** In general, how do the demographics of these workers compare to those of English-speaking internet users overall? Why would it matter if the worker demographics don't match the demographics of the intended end users of the Perspective API?
 
-- I believe that the demographics of the annotators do not fully represent English-speaking internet users overall. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of English content than actual content online from other languages, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
-
+- I believe that the demographics of the annotators do not fully represent English-speaking internet users overall, which relates to **unrepresentative data**. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of people whose first language is English than the actual population online, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
 
 **Q8.** Given what you now know about the Wikipedia Talk Corpus, what issues might arise if it was used to train a machine learning-driven "hostile speech detector" that could be used on any website or social media platform?
 
 - I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because the majority of annotators reported English as their first language, their judgments and evaluation of hostile speech may not fully reflect or identify how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset.
+
+
 
 ## 3.1
 
 #### Code questions
 
 
+
 **Q9. What % of workers who labelled the toxicity dataset do we have demographic data for?**
 
-We have the demographic data for 83.49% of workers who labelled the toxicity dataset, which means that not all the workers who annotated the dataset are represented in the toxicity_worker_demographic.tsv.
+- We have the demographic data for 83.49% of workers who labelled the toxicity dataset, which means that not all the workers who annotated the dataset are represented in the toxicity_worker_demographic.tsv and is an example of **incomplete data**.
 
 **Q10. What % of the comments in the toxicity dataset were labelled by male vs. female-identified workers?**
 
-66.02% of the comments in the toxicity dataset were labelled by male-identified workers and 33.95% of the comments were labelled by female-identified workers. This means more comments were labelled by male-identified workers than female-identified workers.
+- 66.02% of the comments in the toxicity dataset were labelled by male-identified workers and 33.95% of the comments were labelled by female-identified workers. This means more comments were labelled by male-identified workers than female-identified workers.
 
 **Q11. What % of the comments in the toxicity dataset were labelled by people for whom English is NOT their first language?**
 
-17.36% of the comments in the toxicity dataset were labelled by people for whom English is not their first language. This would mean there is a minority of comments that may be non-English in the toxicity dataset.
+- 17.36% of the comments in the toxicity dataset were labelled by people for whom English is not their first language. This means that comments received fewer annotations from workers whose first language is not English than from those whose first language is English.
 
 
 **Q12. Based on your findings from questions 9-11, how might this dataset present a biased view of "toxicity"? How would you expect such biases to impact how the Perspective API performs?**
 
-Based on my findings for 9-11, I would say that this dataset may have a biased view of "toxicity" and could be considered unrepresentative data, as it may not accurately represent everyone's perspectives equally. Since male-identified workers labelled the majority of the comments, their perspectives might influence more what is considered toxic, while female perspectives may influence the dataset less. For example, different annotators may interpret subtle or passive-aggressive remarks differently. And since only a minority of comments were labelled by people whose first language is not English, the dataset may not fully represent how people from different languages interpret toxicity, which I discussed in Q7-8. Finally, since we only have the demographic data for 83.49% of workers who annotated the toxicity dataset, this may limit our ability to understand if the demographics of the annotators are accurately representing the population it is intended to model, as it has incomplete data. These potential biases could impact how the Perspective API performs because a model trained on these annotations might not accurately classify comments as toxic and could fail to recognize toxicity in others, like if there are toxic comments from other languages or could be considered toxic for someone who is female.
+- Based on my findings for 9-11, I would say that this dataset may have a biased view of "toxicity" and could be considered **unrepresentative data**, as it may not accurately represent everyone's perspectives equally. Since male-identified workers labelled the majority of the comments, their perspectives might influence more what is considered toxic, while female perspectives may influence the dataset less. For example, different annotators may interpret subtle or passive-aggressive remarks differently. And since only a minority of comments were labelled by people whose first language is not English, the dataset may not fully represent how people from different languages interpret toxicity, which I discussed in Q7-8. Finally, since we only have the demographic data for 83.49% of workers who annotated the toxicity dataset, this may limit our ability to understand if the demographics of the annotators are accurately representing the population it is intended to model, as it has incomplete data. These potential biases could impact how the Perspective API performs because a model trained on these annotations might not accurately classify comments as toxic and could fail to recognize toxicity in others, like if there are toxic comments from other languages or could be considered toxic for someone who is female.
 
 ## Usage of AI:
 ### Q1-Q4 AI Statement:

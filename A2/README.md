@@ -54,11 +54,24 @@ The most common education level reported was a bachelor's degree, representing 2
 ## 3.1
 
 #### Code questions
-- **Q9.** What % of *workers* who labelled the toxicity dataset do we have demographic data for?
-- **Q10.** What % of the *comments* in the toxicity dataset were labelled by male vs. female-identified workers?
-- **Q11.** What % of the *comments* in the toxicity dataset were labelled by people for whom English is NOT their first language?
-- **Q12.** Based on your findings from questions 9-11, how might this dataset present a biased view of "toxicity"? How would you expect such biases to impact how the Perspective API performs? 
 
+
+**Q9. What % of workers who labelled the toxicity dataset do we have demographic data for?**
+
+We have the demographic data for 83.49% of workers who labelled the toxicity dataset, which means that not all the workers who annotated the dataset are represented in the toxicity_worker_demographic.tsv.
+
+**Q10. What % of the comments in the toxicity dataset were labelled by male vs. female-identified workers?**
+
+66.02% of the comments in the toxicity dataset were labelled by male-identified workers and 33.95% of the comments were labelled by female-identified workers. This means more comments were labelled by male-identified workers than female-identified workers.
+
+**Q11. What % of the comments in the toxicity dataset were labelled by people for whom English is NOT their first language?**
+
+17.36% of the comments in the toxicity dataset were labelled by people for whom English is not their first language. This would mean there is a minority of comments that may be non-English in the toxicity dataset.
+
+
+**Q12. Based on your findings from questions 9-11, how might this dataset present a biased view of "toxicity"? How would you expect such biases to impact how the Perspective API performs?**
+
+Based on my findings for 9-11, I would say that this dataset may have a biased view of "toxicity" and could be considered unrepresentative data, as it may not accurately represent everyone's perspectives equally. Since male-identified workers labelled the majority of the comments, their perspectives might influence more what is considered toxic, while female perspectives may influence the dataset less. For example, different annotators may interpret subtle or passive-aggressive remarks differently. And since only a minority of comments were labelled by people whose first language is not English, the dataset may not fully represent how people from different languages interpret toxicity, which I discussed in Q7-8. Finally, since we only have the demographic data for 83.49% of workers who annotated the toxicity dataset, this may limit our ability to understand if the demographics of the annotators are accurately representing the population it is intended to model, as it has incomplete data. These potential biases could impact how the Perspective API performs because a model trained on these annotations might not accurately classify comments as toxic and could fail to recognize toxicity in others, like if there are toxic comments from other languages or could be considered toxic for someone who is female.
 
 ## Usage of AI:
 ### Q1-Q4 AI Statement:
@@ -269,7 +282,49 @@ plt.xticks(rotation=0)
 plt.tight_layout()
 plt.show()
 ```
-
 **What I changed** I adjusted this code to correctly label the bar chart, as 0 as not English wasn't accurate. I also tweaked the code for that it was showing both the table and bar chart.
 
-*Exercises and assignments for HCDE410: Human Data Interaction. Everything here is a work in progress unless otherwise noted :)*
+### 3.1 AI Statement: 
+
+**AI Prompt:**
+This is format of toxicity_annotations:
+{'rev_id': '2232.0', 'worker_id': '723', 'toxicity': '0', 'toxicity_score': '0.0'}
+
+I need all_annotators to merge and match the toxicity annotations with workers that are in the dataset: toxicity and like this new format that appends all the annotations that match worker_id to the all_annotators:
+{'worker_id': '85', 'gender': 'female', 'english_first_language': '0', 'age_group': '18-30', 'education': 'bachelors', 'dataset': 'toxicity', 'unique_id': '1', 'annotation': {'rev_id': '2232.0', 'toxicity': '0', 'toxicity_score': '0.0'}}
+**AI Output:**
+
+```
+for annotation in toxicity_labels:
+    worker_id = annotation["worker_id"]
+
+    # Store annotation fields without duplicating worker_id
+    annotation_data = {
+        "rev_id": annotation["rev_id"],
+        "toxicity": annotation["toxicity"],
+        "toxicity_score": annotation["toxicity_score"]
+    }
+
+    toxicity_by_worker.setdefault(worker_id, []).append(annotation_data)
+
+# Merge annotations into all_annotators
+for annotator in all_annotators:
+    if annotator["dataset"] == "toxicity":
+        annotator["annotation"] = toxicity_by_worker.get(
+            annotator["worker_id"], []
+        )
+
+
+# Count all annotations attached to workers
+total_matched = sum(
+    len(annotator.get("annotation", []))
+    for annotator in all_annotators
+    if annotator["dataset"] == "toxicity"
+)
+```
+
+
+**What I changed** I had to change the calculation so that it would accurate calculate the percentage.
+
+
+*Exercises and assignments for HCDE410: Human Data Interaction.*

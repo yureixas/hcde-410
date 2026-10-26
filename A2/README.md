@@ -329,4 +329,7 @@ total_matched = sum(
 **What I changed** I had to change the calculation so that it would accurate calculate the percentage.
 
 
+## How to re-run
+Open `A1.ipynb` and run all cells (needs `requests`, `pandas`, `matplotlib`).
+
 *Exercises and assignments for HCDE410: Human Data Interaction.*

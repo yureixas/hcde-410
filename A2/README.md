@@ -330,6 +330,6 @@ total_matched = sum(
 
 
 ## How to re-run
-Open `A1.ipynb` and run all cells (needs `requests`, `pandas`, `matplotlib`).
+Open `hcde410-a2.ipynb` and run all cells (needs `requests`, `pandas`, `matplotlib`).
 
 *Exercises and assignments for HCDE410: Human Data Interaction.*

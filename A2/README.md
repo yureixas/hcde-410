@@ -15,40 +15,39 @@
 
 ## 2.1 Questions and Answers (Descriptive Statistics)
 
-**Q1. What is the gender distribution of these workers?**
 
+**Q1. What is the gender distribution of these workers?**
 Male was the most commonly reported gender, representing 3676 workers (63.59%), followed by female, representing 2103 workers (36.38%). The least commonly reported gender was "Other", representing only 2 workers (0.03%).
 
 **Q2. What is the distribution of the workers by first language?**
-
-4713 workers (81.53%) reported English as their first language, while 1068 workers (18.47%) did not. 
+1068 workers (18.47%)reported English as their first language, while 4713 workers (81.53%) did not. 
 
 **Q3. What is the distribution of these workers by age group?**
-
-The largest age group reported was 18–30, with 2,911 workers (50.35%), followed by ages 30–45 with 2,078 (35.95%), ages 45–60 with 514 (8.89%), and under 18 with 116 (2.01%). The smallest age group reported was over-60, with 50 workers (0.86%). 112 workers (1.94%) also had a blank age-group value.
+The largest age group reported was 18–30, with 2,911 workers (50.35%), followed by ages 30–45 with 2,078 (35.95%), ages 45–60 with 514 (8.89%), and under 18 with 116 (2.01%). The smallest age group reported was over-60, with 50 workers (0.86%). 112 workers (1.94%) also had a blank age group value.
 
 **Q4. What is the distribution of these workers by education level?**
-
 The most common education level reported was a bachelor's degree, representing 2,303 workers (39.84%), followed by high school with 1,657 (28.66%), master's degrees with 931 (16.10%), professional degrees with 684 (11.83%), some education with 141 (2.44%), and doctorate degrees with 61 (1.06%). The least common category reported was “none,” with 4 workers (0.07%), indicating no education level.
+
 
 ## 2.2 
 
-**Q5.** Analyze all_annotators in Sheets or Jupyter: Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?
-
-- The age_group field has 112 missing values, which represents 1.94% of the rows. Earlier, I wasn't sure what this missing field meant in the bar chart, even when discussing the distribution in Q3. This means this dataset has **incomplete data**, which could affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
-
-**Q6.** Build a version of the all_annotators dataset *without removing duplicates*, then re-run the summary statistics from questions 1-4. How have these summary statistics changed?
-
-- Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset, which is an example of **duplicated data**. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is now distorted and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
+**Q5** 
+The age_group field has 112 missing values, which represents 1.94% of the rows. Earlier, I wasn't sure what this missing field meant in the bar chart, even when discussing the distribution in Q3. This means this dataset has **incomplete data**, which could affect the analysis of the annotator distribution because it can skew the percentage and make the analysis inaccurate.
 
 
-**Q7.** In general, how do the demographics of these workers compare to those of English-speaking internet users overall? Why would it matter if the worker demographics don't match the demographics of the intended end users of the Perspective API?
+**Q6**
+Including both the aggression and attack workers changed the percentage values of the distribution, as workers' demographic data are counted and represented twice in the annotator dataset, which is an example of **duplicated data**. The all_annotators dataset originally contained only 5,781 workers but has now increased to 7,971 workers. As a result, some percentages slightly changed, such as women going from 36.38% to 36.92% or the age group of 18-30 going from 50.35% to 49.68%. Although these changes were very slight, this new dataset could still be misleading, as the distribution of the overall annotator population is now distorted and shows how duplicated data could skew descriptive statistics, leading someone to make incorrect conclusions.
 
-- I believe that the demographics of the annotators do not fully represent English-speaking internet users overall, which relates to **unrepresentative data**. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported English as their first language. This matters because it could imply that this dataset has more representation of people whose first language is English than the actual population online, making this dataset less accurate in evaluating languages other than English, as the annotators possibly evaluated English hostile speech more than any other language. If this dataset is intended to detect hostile speech across the internet, the training data should incorporate more data from different languages, otherwise, this dataset underrepresents languages other than English when evaluating hostile speech.
 
-**Q8.** Given what you now know about the Wikipedia Talk Corpus, what issues might arise if it was used to train a machine learning-driven "hostile speech detector" that could be used on any website or social media platform?
+**Q7**
+I believe that the demographics of the annotators do not fully represent English-speaking internet users overall, which could relate to **unrepresentative data**. [Statistica](https://www.statista.com/chart/26884/most-spoken-languages-online-offline/?srsltid=AYCX9vIjS0PpfV6O0S05G9qWuK-vcdXdM4srElkStTpXWKt-6Z8wBy-N) reported that English accounts for 51.2% of the language used online, but the majority of the annotators (~80%) reported as not their English as their first language. This matters because it could imply that this dataset has less representation of people whose first language is English than the actual population online, which may make this dataset less accurate in evaluating English because the annotators may not be as familiar with hostile speech in English, but this is only an assumption since we don't know if this necessarily makes their annotations less accurate or how fluent they are in English.
 
-- I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because the majority of annotators reported English as their first language, their judgments and evaluation of hostile speech may not fully reflect or identify how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset.
+
+**Q8**
+I believe that if these datasets were used to train a machine learning-driven "hostile speech detector" for different websites and platforms, the model might not accurately identify hostile speech in languages other than English. Because this dataset was looking at only English Wikipedia and the majority of annotators reported English as not their first language, their judgments and evaluation of hostile speech in English may not fully be accurate or reflect how hostility is expressed or interpreted in other languages and cultural contexts. This would be concerning as it could make the detector less reliable and unfair to users from underrepresented languages that were not evaluated equally in the dataset or if annotators interpreted hostile speech from their own cultural context onto English.
+
+
+
 
 
 
@@ -58,22 +57,23 @@ The most common education level reported was a bachelor's degree, representing 2
 
 
 
+
 **Q9. What % of workers who labelled the toxicity dataset do we have demographic data for?**
 
-- We have the demographic data for 83.49% of workers who labelled the toxicity dataset, which means that not all the workers who annotated the dataset are represented in the toxicity_worker_demographic.tsv and is an example of **incomplete data**.
+We have the demographic data for 83.49% of workers who labelled the toxicity dataset, which means that not all the workers who annotated the dataset are represented in the toxicity_worker_demographic.tsv and is an example of **incomplete data**.
 
 **Q10. What % of the comments in the toxicity dataset were labelled by male vs. female-identified workers?**
 
-- 66.02% of the comments in the toxicity dataset were labelled by male-identified workers and 33.95% of the comments were labelled by female-identified workers. This means more comments were labelled by male-identified workers than female-identified workers.
+66.02% of the comments in the toxicity dataset were labelled by male-identified workers and 33.95% of the comments were labelled by female-identified workers. This means more comments were labelled by male-identified workers than female-identified workers.
 
 **Q11. What % of the comments in the toxicity dataset were labelled by people for whom English is NOT their first language?**
 
-- 17.36% of the comments in the toxicity dataset were labelled by people for whom English is not their first language. This means that comments received fewer annotations from workers whose first language is not English than from those whose first language is English.
+82.64% of the comments in the toxicity dataset were labelled by people for whom English is not their first language. This means that comments received from workers whose first language is not English were the majority than from those whose first language is English.
 
 
 **Q12. Based on your findings from questions 9-11, how might this dataset present a biased view of "toxicity"? How would you expect such biases to impact how the Perspective API performs?**
 
-- Based on my findings for 9-11, I would say that this dataset may have a biased view of "toxicity" and could be considered **unrepresentative data**, as it may not accurately represent everyone's perspectives equally. Since male-identified workers labelled the majority of the comments, their perspectives might influence more what is considered toxic, while female perspectives may influence the dataset less. For example, different annotators may interpret subtle or passive-aggressive remarks differently. And since only a minority of comments were labelled by people whose first language is not English, the dataset may not fully represent how people from different languages interpret toxicity, which I discussed in Q7-8. Finally, since we only have the demographic data for 83.49% of workers who annotated the toxicity dataset, this may limit our ability to understand if the demographics of the annotators are accurately representing the population it is intended to model, as it has incomplete data. These potential biases could impact how the Perspective API performs because a model trained on these annotations might not accurately classify comments as toxic and could fail to recognize toxicity in others, like if there are toxic comments from other languages or could be considered toxic for someone who is female.
+Based on my findings for 9-11, I would say that this dataset may have a biased view of "toxicity" and could be considered **unrepresentative data**, as it may not accurately represent everyone's perspectives equally. Since male-identified workers labelled the majority of the comments, their perspectives might influence more what is considered toxic, while female perspectives may influence the dataset less. For example, different annotators may interpret subtle or passive-aggressive remarks differently. And since only a majority of comments were labelled by people whose first language is not English, the dataset may not fully represent how people from different languages interpret toxicity or if the hostile speech they identified is fully accurate, which I discussed in Q7-8. Finally, since we only have the demographic data for 83.49% of workers who annotated the toxicity dataset, this may limit our ability to understand if the demographics of the annotators are accurately representing the population it is intended to model, as it has incomplete data. These potential biases could impact how the Perspective API performs because a model trained on these annotations might not accurately classify comments as toxic and could fail to recognize toxicity in others, like if there are toxic comments from other languages or could be considered toxic for someone who is female or speaks English as a first language.
 
 ## Usage of AI:
 ### Q1-Q4 AI Statement:
@@ -141,7 +141,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-**What I changed** I adjusted this code so that it could be used for each bar chart when necessary (Like if there are more than 5 categories, I would make the bar chart horizontal)
+**What I changed** A big mistake I ran into with this code was that I believed that 0 was equal to English as first language and 1 was equal to English as not first language because of the code ChatGPT gave me. This made my analysis wrong at first, until I swapped the values.
 
 ### Q5 - AI Statement:
 **AI prompt:** Use the Python pandas library to create a table that could show missing values or empty cells in a dataset. This is supposed to help answer "Do any of the fields in this dataset have missing data? If so, which fields, and what % of the rows contain missing values?" For reference, this is how one of the tables is being formatted:
@@ -284,7 +284,7 @@ plt.xticks(rotation=0)
 plt.tight_layout()
 plt.show()
 ```
-**What I changed** I adjusted this code to correctly label the bar chart, as 0 as not English wasn't accurate. I also tweaked the code for that it was showing both the table and bar chart.
+**What I changed** I used this code later for Q1-Q4 to guide my analysis, where I accidentally interpreted 0 as English and 1 as not English.
 
 ### 3.1 AI Statement: 
 

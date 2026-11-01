@@ -1,149 +1,711 @@
 run,prompt,model,version,timestamp,output,verified,notes
-1,"Summarize these three sources by providing three main bullet points for each: 
-https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38
-https://link.springer.com/article/10.1007/s10567-012-0121-z
-https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x",ChatGPT,Unknown,2s,"## 1. [ADHD in College Students: Developmental Findings (2008)](https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38?utm_source=chatgpt.com)
+1,"I want you to give me the full code that uses pandas (assuming I have it set up the file name to be World_Bank_CO2_RawData.tsv) to help me compute the CO2 (kt) emissions by region (grouping countries in the dataset by region first) in the year 2010 in a table, including percentages and also give me code for a bar chart showcasing this.
+The dataset does NOT contain a Region column. Create one in the code by assigning each country to its appropriate World Bank geographic region, the lists these fall under are Country Name and Country Code This data is from the World Bank Database on Carbon Emissions if you need reference: https://databank.worldbank.org/source/millennium-development-goals/Series/EN.ATM.CO2E.KT ",ChatGPT,Unknown,38s,"
+import pandas as pd
+import matplotlib.pyplot as plt
 
-- College students with ADHD face increased risks of academic and psychological difficulties compared with their peers.
-- Common support options include medication, ADHD coaching, and educational accommodations, although research on their effectiveness specifically for college students is limited.
-- More rigorous, long-term research is needed to understand ADHD in college students and identify effective interventions.&#x20;
+# --------------------------------------------------
+# 1. LOAD THE DATASET
+# --------------------------------------------------
 
-  [image](https://www.google.com/s2/favicons?domain=https://onlinelibrary.wiley.com\&sz=32)
+file_name = ""World_Bank_CO2_RawData.tsv""
 
-  Wiley Online Library
+df = pd.read_csv(file_name, sep=""\t"")
+
+# Clean column names and country codes
+df.columns = df.columns.str.strip()
+df[""Country Code""] = df[""Country Code""].astype(str).str.strip().str.upper()
+
+# --------------------------------------------------
+# 2. GET WORLD BANK COUNTRY-TO-REGION CLASSIFICATIONS
+# --------------------------------------------------
+
+# Retrieve country metadata from the World Bank API
+api_url = (
+    ""https://api.worldbank.org/v2/country""
+    ""?format=json&per_page=400""
+)
+
+wb_response = pd.read_json(api_url, typ=""series"")
+
+# The second element contains the country records
+wb_countries = pd.json_normalize(wb_response.iloc[1])
+
+# Keep the country code and geographic region
+region_data = wb_countries[
+    [""id"", ""region.value""]
+].copy()
+
+region_data.columns = [""Country Code"", ""Region""]
+
+# Remove aggregate entries that do not have a geographic region
+region_data = region_data.dropna(subset=[""Region""])
+
+# Remove empty region values
+region_data = region_data[
+    region_data[""Region""].str.strip() != """"
+]
+
+# Create a dictionary matching country codes to regions
+country_region = dict(
+    zip(region_data[""Country Code""], region_data[""Region""])
+)
+
+# --------------------------------------------------
+# 3. CREATE THE REGION COLUMN
+# --------------------------------------------------
+
+df[""Region""] = df[""Country Code""].map(country_region)
+
+# Check for countries that could not be matched
+unmatched = df.loc[
+    df[""Region""].isna(),
+    [""Country Name"", ""Country Code""]
+].drop_duplicates()
+
+if not unmatched.empty:
+    print(""WARNING: The following entries have no region match:"")
+    print(unmatched.to_string(index=False))
+
+# --------------------------------------------------
+# 4. SELECT CO2 EMISSIONS FOR 2010
+# --------------------------------------------------
+
+# Convert 2010 emissions to numeric values
+df[""2010""] = pd.to_numeric(df[""2010""], errors=""coerce"")
+
+# Keep only entries with a geographic region
+# and valid CO2 emissions data
+df_2010 = df[
+    (df[""Region""].notna()) &
+    (df[""2010""].notna())
+].copy()
+
+# --------------------------------------------------
+# 5. GROUP COUNTRIES BY REGION
+# --------------------------------------------------
+
+# Sum CO2 emissions (kt) for each geographic region
+region_emissions = (
+    df_2010.groupby(""Region"")[""2010""]
+    .sum()
+    .reset_index()
+)
+
+# Rename columns for clarity
+region_emissions.columns = [
+    ""Region"",
+    ""CO2 Emissions (kt)""
+]
+
+# --------------------------------------------------
+# 6. CALCULATE PERCENTAGES
+# --------------------------------------------------
+
+# Calculate total emissions across the included regions
+total_emissions = region_emissions[""CO2 Emissions (kt)""].sum()
+
+# Calculate each region's percentage of total emissions
+region_emissions[""Percentage (%)""] = (
+    region_emissions[""CO2 Emissions (kt)""]
+    / total_emissions
+) * 100
+
+# Sort regions from highest to lowest emissions
+region_emissions = region_emissions.sort_values(
+    by=""CO2 Emissions (kt)"",
+    ascending=False
+)
+
+# Round values for presentation
+region_emissions[""CO2 Emissions (kt)""] = (
+    region_emissions[""CO2 Emissions (kt)""].round(2)
+)
+
+region_emissions[""Percentage (%)""] = (
+    region_emissions[""Percentage (%)""].round(2)
+)
+
+# --------------------------------------------------
+# 7. DISPLAY THE RESULTS TABLE
+# --------------------------------------------------
+
+print(""\nCO2 Emissions by World Bank Geographic Region (2010)"")
+print(""="" * 65)
+
+print(region_emissions.to_string(index=False))
+
+print(""\nTotal CO2 Emissions (kt):"",
+      f""{total_emissions:,.2f}"")
+
+# --------------------------------------------------
+# 8. CREATE A BAR CHART
+# --------------------------------------------------
+
+plt.figure(figsize=(12, 7))
+
+plt.bar(
+    region_emissions[""Region""],
+    region_emissions[""CO2 Emissions (kt)""],
+    color=""steelblue"",
+    edgecolor=""black""
+)
+
+# Chart title and axis labels
+plt.title(
+    ""CO2 Emissions by World Bank Geographic Region (2010)"",
+    fontsize=15,
+    fontweight=""bold""
+)
+
+plt.xlabel(""World Bank Geographic Region"", fontsize=12)
+
+plt.ylabel(""CO2 Emissions (kt)"", fontsize=12)
+
+# Rotate region labels for readability
+plt.xticks(rotation=35, ha=""right"")
+
+# Add gridlines
+plt.grid(axis=""y"", linestyle=""--"", alpha=0.5)
+
+# Adjust layout
+plt.tight_layout()
+
+# Display chart
+plt.show()
+
+# --------------------------------------------------
+# 9. OPTIONAL: SAVE RESULTS
+# --------------------------------------------------
+
+region_emissions.to_csv(
+    ""CO2_Emissions_by_Region_2010.csv"",
+    index=False
+)
+
+plt.savefig(
+    ""CO2_Emissions_by_Region_2010.png"",
+    dpi=300,
+    bbox_inches=""tight""
+)
+
+print(""\nResults saved successfully!"")",wrong,"The LLM put everything into an aggregates category (?) which messed up the calculation of the correct percentages. It did get the correct sum of CO2(kt) per region though, with slight variation in decimals. However, only the Middle East and North Africa region was off by around 170k, which was interesting. It apparently pulled from an API which may have contributed to this?"
+2,"I want you to give me the full code that uses pandas (assuming I have it set up the file name to be World_Bank_CO2_RawData.tsv) to help me compute the CO2 (kt) emissions by region (grouping countries in the dataset by region first) in the year 2010 in a table, including percentages and also give me code for a bar chart showcasing this.
+The dataset does NOT contain a Region column. Create one in the code by assigning each country to its appropriate World Bank geographic region, the lists these fall under are Country Name and Country Code This data is from the World Bank Database on Carbon Emissions if you need reference: https://databank.worldbank.org/source/millennium-development-goals/Series/EN.ATM.CO2E.KT ",ChatGPT,Unknown,27s,"
+# ============================================================
+# CO2 EMISSIONS BY WORLD BANK REGION (2010)
+# ============================================================
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ------------------------------------------------------------
+# 1. LOAD THE DATASET
+# ------------------------------------------------------------
+
+file_name = ""World_Bank_CO2_RawData.tsv""
+
+df = pd.read_csv(file_name, sep=""\t"")
+
+# Display column names to check the dataset
+print(""Dataset columns:"")
+print(df.columns.tolist())
 
 
-## 2. [Developmental Context and Treatment Principles for ADHD Among College Students (2012)](https://link.springer.com/article/10.1007/s10567-012-0121-z?utm_source=chatgpt.com)
+# ------------------------------------------------------------
+# 2. RETRIEVE WORLD BANK COUNTRY-TO-REGION CLASSIFICATIONS
+# ------------------------------------------------------------
 
-- College requires greater independence, with less external structure and more distractions, making self-regulation especially challenging for students with ADHD.
-- ADHD is associated with difficulties in academic, psychological, and social functioning, including lower GPAs, graduation rates, and quality of life.
-- Effective interventions should account for the developmental needs of college students and help them manage the demands of college life.&#x20;
+# World Bank API: country metadata
+# Includes country codes, names and geographic regions.
 
-  [image](https://www.google.com/s2/favicons?domain=https://pubmed.ncbi.nlm.nih.gov\&sz=32)
+url = ""https://api.worldbank.org/v2/country?format=json&per_page=400""
 
-  PubMed
+wb_data = pd.read_json(url)
 
+# The second element contains the country records
+countries = pd.json_normalize(wb_data.iloc[1])
 
+# Keep only the relevant columns
+region_data = countries[[""id"", ""name"", ""region.value""]].copy()
 
-## 3. [ADHD in the College Student: A Block in the Road (2009)](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x?utm_source=chatgpt.com)
+# Rename columns to match the main dataset
+region_data.columns = [""Country Code"", ""WB Country Name"", ""Region""]
 
-- The transition to college can be difficult because students lose parental supervision and structure while gaining more freedom, variable schedules, and distractions.
-- Interviews with 15 college students with ADHD identified three key themes: understanding ADHD, managing everyday life, and using sources of support.
-- Preparing students for college by building self-awareness, practical life-management skills, and support networks may help them adjust more successfully.&#x20;
+# Remove regional/income aggregates rather than countries
+region_data = region_data[
+    region_data[""Region""] != ""Aggregates""
+]
 
-  [image](https://www.google.com/s2/favicons?domain=https://onlinelibrary.wiley.com\&sz=32)
+# Remove empty region classifications
+region_data = region_data[
+    region_data[""Region""].notna()
+    & (region_data[""Region""] != """")
+]
 
-  Wiley Online Library",Yes,"It gives three bullet points that accurately reflect the information in the research papers but may have left out some information, such as for the third article, it focused a lot more about viewing ADHD as a ""block in the road"" or something that they tried to hide"
-2,"Summarize these three sources by providing three main bullet points for each: 
-https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38
-https://link.springer.com/article/10.1007/s10567-012-0121-z
-https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x",ChatGPT,Unknown,3s,"## 1. “ADHD in College Students: Developmental Findings” (2008)
-
-Authors: Lisa L. Weyandt and George J. DuPaul.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://onlinelibrary.wiley.com\&sz=32)
-
-Wiley Online Library
-
-
-
-- Academic and psychological challenges: College students with ADHD are more likely to experience academic difficulties and psychological challenges than students without ADHD.
-- Treatment and support: Common approaches include stimulant medication, coaching, and educational accommodations, but research on how effective these treatments are specifically for college students remains limited.
-- Need for further research: More long-term studies with larger samples are needed to better understand college students with ADHD and identify effective support strategies.
-
-Source: [Read the article](https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38?utm_source=chatgpt.com).
-
-## 2. “Developmental Context and Treatment Principles for ADHD Among College Students” (2012)
-
-Authors: Andrew P. Fleming and Robert J. McMahon.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://link.springer.com\&sz=32)
-
-Springer Nature Link
+# Remove any duplicate country codes
+region_data = region_data.drop_duplicates(
+    subset=""Country Code""
+)
 
 
+# ------------------------------------------------------------
+# 3. CREATE THE REGION COLUMN
+# ------------------------------------------------------------
 
-- College increases self-management demands: Less structure, greater independence, and more immediate distractions can make it harder for students with ADHD to regulate their behavior and manage responsibilities.
-- Impact on student outcomes: ADHD is associated with academic, psychological, and social difficulties, including lower GPAs, lower graduation rates, and reduced quality of life.
-- Need for tailored interventions: The review identifies treatment goals and principles for supporting college students with ADHD, emphasizing the need for interventions designed around their developmental stage and college-specific challenges.
+# Match countries using their Country Code
+df = df.merge(
+    region_data[[""Country Code"", ""Region""]],
+    on=""Country Code"",
+    how=""left""
+)
 
-Source: [Read the article](https://link.springer.com/article/10.1007/s10567-012-0121-z?utm_source=chatgpt.com).
+# Check countries that could not be assigned a region
+unmatched = df.loc[
+    df[""Region""].isna(),
+    [""Country Name"", ""Country Code""]
+].drop_duplicates()
 
-## 3. “ADHD in the College Student: A Block in the Road” (2009)
-
-Authors: J. B. Meaux, A. Green, and L. Broussard.&#x20;
-
-[image](https://www.google.com/s2/favicons?domain=https://onlinelibrary.wiley.com\&sz=32)
-
-Wiley Online Library
-
-
-
-- Transition to college: Students with ADHD may struggle when they lose parental supervision and familiar routines while adjusting to changing schedules, greater independence, and campus distractions.
-- Three key areas of adjustment: Interviews with 15 college students identified three major themes: understanding ADHD, managing everyday life, and using sources of support. Students experienced both helpful and challenging factors in each area.
-- Importance of early preparation: Understanding students’ experiences can help educators and support providers prepare adolescents with ADHD for college by building self-management skills and identifying useful support systems before the transition.
-
-Source: [Read the article](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x?utm_source=chatgpt.com).",Yes,"This time, it wrote out the names of the authors and also a main summary bullet point before going into detail"
-3,"Summarize these three sources by providing three main bullet points for each: 
-https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38
-https://link.springer.com/article/10.1007/s10567-012-0121-z
-https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x",ChatGPT,Unknown,5s,"## 1. [ADHD in College Students: Developmental Findings](https://onlinelibrary.wiley.com/doi/10.1002/ddrr.38?utm_source=chatgpt.com) (Weyandt & DuPaul, 2008)
-
-- Academic and psychological challenges: College students with ADHD are at greater risk of academic difficulties and psychological problems than their peers without ADHD.
-- Treatment and support: Common approaches include stimulant medication, coaching, and educational accommodations. Misuse of prescription stimulants is also a concern on college campuses.
-- Research limitations: Existing studies are limited in number and methodology, highlighting the need for larger studies and long-term research to evaluate effective interventions.&#x20;
-
-  [image](https://www.google.com/s2/favicons?domain=https://onlinelibrary.wiley.com\&sz=32)
-
-  Wiley Online Library+1
+if not unmatched.empty:
+    print(""\nCountries without a matched region:"")
+    print(unmatched.to_string(index=False))
 
 
+# ------------------------------------------------------------
+# 4. FILTER DATA FOR THE YEAR 2010
+# ------------------------------------------------------------
 
-## 2. [Developmental Context and Treatment Principles for ADHD Among College Students](https://link.springer.com/article/10.1007/s10567-012-0121-z?utm_source=chatgpt.com) (Fleming & McMahon, 2012)
+# The World Bank raw data commonly uses years as columns.
+# Select the 2010 column.
 
-- Transition to college: College presents new challenges for students with ADHD because of reduced external structure, greater independence, and increased access to immediate rewards and distractions.
-- Self-regulation difficulties: ADHD-related difficulties with executive functioning and behavioral regulation can affect academic performance, social relationships, and everyday responsibilities.
-- Individualized treatment: Support should account for students' developmental needs and college environments. Treatment approaches include medication and psychosocial interventions, such as strategies for improving organization, time management, and self-regulation.&#x20;
+year = ""2010""
 
-  [image](https://www.google.com/s2/favicons?domain=https://pubmed.ncbi.nlm.nih.gov\&sz=32)
+if year not in df.columns:
+    raise KeyError(
+        f""Column '{year}' was not found. ""
+        f""Available columns: {df.columns.tolist()}""
+    )
 
-  PubMed+2
+# Convert emissions data to numeric values
+df[year] = pd.to_numeric(df[year], errors=""coerce"")
 
-
-
-## 3. [ADHD in the College Student: A Block in the Road](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x?utm_source=chatgpt.com) (Meaux, Green, & Broussard, 2009)
-
-- Challenges of independence: Students with ADHD may struggle when transitioning from home to college because they lose parental supervision and established routines while gaining more freedom and responsibilities.
-- Three major themes: Interviews with 15 college students identified three themes: gaining insight about ADHD, managing everyday life, and utilizing sources of support. Each theme included both helpful factors and barriers.
-- Importance of early preparation: Understanding ADHD, developing independent living and academic skills, and establishing support systems can help students manage college demands. Interventions should begin before students make the transition to college.&#x20;
-
-  [image](https://www.google.com/s2/favicons?domain=https://pubmed.ncbi.nlm.nih.gov\&sz=32)
-
-  PubMed+1
+# Keep only countries with a region and valid 2010 data
+df_2010 = df[
+    df[""Region""].notna()
+    & df[year].notna()
+].copy()
 
 
+# ------------------------------------------------------------
+# 5. CALCULATE TOTAL CO2 EMISSIONS BY REGION
+# ------------------------------------------------------------
 
-### Overall takeaway
+# Group countries by their geographic region
+regional_emissions = (
+    df_2010
+    .groupby(""Region"")[year]
+    .sum()
+    .reset_index()
+)
 
-All three sources emphasize that college students with ADHD often face increased academic, psychological, and self-management challenges when transitioning to greater independence. Effective support can include medication, coaching, accommodations, organizational strategies, and social support. However, more research is needed to determine which interventions work best for college students.",Yes,"It added an overall takeaway section, which was not something I requested in the prompt"
-4,"Summarize these three sources by providing three main bullet points for each: 
-https://onlinelibrary.wiley.com/doi/abs/10.1002/ddrr.38
-https://link.springer.com/article/10.1007/s10567-012-0121-z
-https://onlinelibrary.wiley.com/doi/full/10.1111/j.1365-2850.2008.01349.x",Claude,Sonnet 5.5 Medium,23s,"The two Wiley links blocked my access, and the Springer article is paywalled. These summaries come from the abstracts, which I found through the Springer page and other repositories, so they don't cover the full text of any paper.
+# Rename the emissions column
+regional_emissions.columns = [
+    ""Region"",
+    ""CO2 Emissions (kt)""
+]
 
-**1. Weyandt & DuPaul (2008), ""ADHD in college students: Developmental findings""**
-- Interest in college students with ADHD has grown because more high school students with ADHD are pursuing higher education, and because prescription stimulant misuse on campuses has been reported.
-- Compared with the general college population, students with ADHD face greater risk of academic and psychological difficulties, and stimulant misuse is a problem on many campuses.
-- The authors call these findings preliminary, given methodological limitations and the small number of studies. They recommend larger samples, rigorous assessment criteria and longitudinal designs.
+# Calculate total emissions across the represented regions
+total_emissions = regional_emissions[
+    ""CO2 Emissions (kt)""
+].sum()
 
-**2. Fleming & McMahon (2012), ""Developmental Context and Treatment Principles for ADHD Among College Students""**
-- ADHD affects roughly 2–8% of college students and is linked to lower GPAs, lower graduation rates and poorer self-reported quality of life.
-- College typically offers less external structure and more immediate rewards. This raises demands on behavioral self-regulation, which is already a weak spot for students with ADHD.
-- Almost no treatment development research exists for this group. The review combines research on functional impairment, the developmental context of emerging adulthood, and treatment outcomes in adolescents and adults, and proposes treatment targets and intervention principles.
+# Calculate each region's percentage contribution
+regional_emissions[""Percentage (%)""] = (
+    regional_emissions[""CO2 Emissions (kt)""]
+    / total_emissions
+) * 100
 
-**3. Meaux, Green & Broussard (2009), ""ADHD in the college student: A block in the road""**
-- The study used semi-structured qualitative interviews with 15 college students with ADHD, plus follow-up interviews to confirm the information.
-- Losing parental supervision and structure, along with variable course schedules and the freedom and distractions of campus life, can lead to health-risk behaviors in students with ADHD.
-- The analysis found three themes: gaining insight about ADHD, managing life, and using sources of support. Each theme includes factors that help and factors that hinder, and these could ground interventions that prepare younger adolescents before they transition to college.
+# Sort regions from highest to lowest emissions
+regional_emissions = regional_emissions.sort_values(
+    by=""CO2 Emissions (kt)"",
+    ascending=False
+)
 
-If you can download the PDFs, upload them and I can give you summaries based on the full text.",Yes,"This LLM was a lot more transparent about the extent of access they had in the sources, which I was not given before for the previous ChatGPT runs. This made me wonder if the previous prompts had actually gotten full access to the article when it wrote the bulletpoints, even though each bulletpoint is accurate"
+# Format the table for presentation
+regional_emissions[""CO2 Emissions (kt)""] = (
+    regional_emissions[""CO2 Emissions (kt)""].round(2)
+)
+
+regional_emissions[""Percentage (%)""] = (
+    regional_emissions[""Percentage (%)""].round(2)
+)
+
+
+# ------------------------------------------------------------
+# 6. DISPLAY THE RESULTS TABLE
+# ------------------------------------------------------------
+
+print(""\n=============================================="")
+print(""WORLD BANK REGIONAL CO2 EMISSIONS - 2010"")
+print(""=============================================="")
+
+print(regional_emissions.to_string(index=False))
+
+print(""\nTotal CO2 emissions (kt):"",
+      round(total_emissions, 2))
+
+
+# ------------------------------------------------------------
+# 7. CREATE A BAR CHART
+# ------------------------------------------------------------
+
+plt.figure(figsize=(12, 7))
+
+bars = plt.bar(
+    regional_emissions[""Region""],
+    regional_emissions[""CO2 Emissions (kt)""],
+    color=""steelblue"",
+    edgecolor=""black""
+)
+
+# Add title and axis labels
+plt.title(
+    ""CO2 Emissions by World Bank Geographic Region (2010)"",
+    fontsize=15,
+    fontweight=""bold""
+)
+
+plt.xlabel(""World Bank Geographic Region"", fontsize=12)
+
+plt.ylabel(""CO2 Emissions (kt)"", fontsize=12)
+
+# Rotate region names for readability
+plt.xticks(rotation=35, ha=""right"")
+
+# Add emissions values above each bar
+for bar in bars:
+    height = bar.get_height()
+
+    plt.text(
+        bar.get_x() + bar.get_width() / 2,
+        height,
+        f""{height:,.0f}"",
+        ha=""center"",
+        va=""bottom"",
+        fontsize=9
+    )
+
+plt.grid(axis=""y"", linestyle=""--"", alpha=0.4)
+
+plt.tight_layout()
+
+# Display the chart
+plt.show()
+
+
+# ------------------------------------------------------------
+# 8. OPTIONAL: SAVE RESULTS
+# ------------------------------------------------------------
+
+regional_emissions.to_csv(
+    ""CO2_Emissions_By_Region_2010.csv"",
+    index=False
+)
+
+plt.savefig(
+    ""CO2_Emissions_By_Region_2010.png"",
+    dpi=300,
+    bbox_inches=""tight""
+)
+
+print(""\nResults saved successfully!"")",can't tell,This code is completely unrunnable and throws and error so I was unable to check if it calculated the table correctly.
+3,"I want you to give me the full code that uses pandas (assuming I have it set up the file name to be World_Bank_CO2_RawData.tsv) to help me compute the CO2 (kt) emissions by region (grouping countries in the dataset by region first) in the year 2010 in a table, including percentages and also give me code for a bar chart showcasing this.
+The dataset does NOT contain a Region column. Create one in the code by assigning each country to its appropriate World Bank geographic region, the lists these fall under are Country Name and Country Code This data is from the World Bank Database on Carbon Emissions if you need reference: https://databank.worldbank.org/source/millennium-development-goals/Series/EN.ATM.CO2E.KT ",ChatGPT,Unknown,44s,"
+import pandas as pd
+import matplotlib.pyplot as plt
+import json
+from urllib.request import urlopen
+
+# ============================================================
+# STEP 1: LOAD THE DATASET
+# ============================================================
+
+file_name = ""World_Bank_CO2_RawData.tsv""
+
+df = pd.read_csv(file_name, sep=""\t"")
+
+# Remove unnecessary spaces from column names
+df.columns = df.columns.str.strip()
+
+# ============================================================
+# STEP 2: RETRIEVE WORLD BANK COUNTRY-REGION CLASSIFICATIONS
+# ============================================================
+
+# World Bank API: retrieves country codes and geographic regions
+url = ""https://api.worldbank.org/v2/country?format=json&per_page=400""
+
+with urlopen(url) as response:
+    world_bank_data = json.loads(response.read().decode(""utf-8""))
+
+countries = world_bank_data[1]
+
+# Create a dictionary mapping country codes to geographic regions
+country_region = {}
+
+for country in countries:
+
+    country_code = country[""id""]
+    region = country[""region""][""value""]
+
+    # Exclude regional aggregates and other non-country entries
+    if country[""region""][""id""] != """":
+        country_region[country_code] = region
+
+# Create a new Region column using Country Code
+df[""Country Code""] = df[""Country Code""].astype(str).str.strip().str.upper()
+
+df[""Region""] = df[""Country Code""].map(country_region)
+
+# ============================================================
+# STEP 3: SELECT CO2 EMISSIONS FOR 2010
+# ============================================================
+
+# Identify the 2010 column
+year_column = ""2010""
+
+# If the dataset contains multiple indicators, select CO2 emissions
+if ""Series Code"" in df.columns:
+    df = df[df[""Series Code""] == ""EN.ATM.CO2E.KT""]
+
+elif ""Indicator Code"" in df.columns:
+    df = df[df[""Indicator Code""] == ""EN.ATM.CO2E.KT""]
+
+# Convert 2010 emissions to numeric values
+df[year_column] = pd.to_numeric(df[year_column], errors=""coerce"")
+
+# Remove rows without a valid region or emissions value
+df = df.dropna(subset=[""Region"", year_column])
+
+# ============================================================
+# STEP 4: GROUP COUNTRIES BY REGION
+# ============================================================
+
+# Sum the CO2 emissions of all countries within each region
+region_emissions = (
+    df.groupby(""Region"")[year_column]
+    .sum()
+    .reset_index()
+)
+
+# Rename columns for clarity
+region_emissions.columns = [
+    ""Region"",
+    ""CO2 Emissions (kt)""
+]
+
+# ============================================================
+# STEP 5: CALCULATE PERCENTAGE CONTRIBUTIONS
+# ============================================================
+
+# Calculate the total emissions across all included regions
+total_emissions = region_emissions[""CO2 Emissions (kt)""].sum()
+
+# Calculate each region's percentage contribution
+region_emissions[""Percentage (%)""] = (
+    region_emissions[""CO2 Emissions (kt)""]
+    / total_emissions
+    * 100
+)
+
+# Sort regions from highest to lowest emissions
+region_emissions = region_emissions.sort_values(
+    by=""CO2 Emissions (kt)"",
+    ascending=False
+)
+
+# Format the results for presentation
+region_emissions[""CO2 Emissions (kt)""] = (
+    region_emissions[""CO2 Emissions (kt)""].round(2)
+)
+
+region_emissions[""Percentage (%)""] = (
+    region_emissions[""Percentage (%)""].round(2)
+)
+
+# ============================================================
+# STEP 6: DISPLAY THE RESULTS TABLE
+# ============================================================
+
+print(""\nWORLD BANK CO2 EMISSIONS BY REGION (2010)"")
+print(""="" * 65)
+
+print(region_emissions.to_string(index=False))
+
+print(""\nTotal CO2 Emissions (kt):"",
+      f""{total_emissions:,.2f}"")
+
+# ============================================================
+# STEP 7: CREATE A BAR CHART
+# ============================================================
+
+plt.figure(figsize=(12, 7))
+
+bars = plt.bar(
+    region_emissions[""Region""],
+    region_emissions[""CO2 Emissions (kt)""],
+    color=""steelblue"",
+    edgecolor=""black""
+)
+
+# Add percentage labels above each bar
+for bar, percentage in zip(
+    bars,
+    region_emissions[""Percentage (%)""]
+):
+
+    height = bar.get_height()
+
+    plt.text(
+        bar.get_x() + bar.get_width() / 2,
+        height,
+        f""{percentage:.2f}%"",
+        ha=""center"",
+        va=""bottom"",
+        fontsize=9
+    )
+
+# Chart title and axis labels
+plt.title(
+    ""CO2 Emissions by World Bank Geographic Region (2010)"",
+    fontsize=14,
+    fontweight=""bold""
+)
+
+plt.xlabel(""Geographic Region"", fontsize=11)
+
+plt.ylabel(""CO2 Emissions (kt)"", fontsize=11)
+
+plt.xticks(rotation=35, ha=""right"")
+
+plt.grid(axis=""y"", linestyle=""--"", alpha=0.5)
+
+plt.tight_layout()
+
+# Display the chart
+plt.show()",wrong,"This time, the code can be run but shows me another aggregates row which messes up the calculation of the percentages. The calculations of CO2(kt) are the exact same as in run 1"
+4,"I want you to give me the full code that uses pandas (assuming I have it set up the file name to be World_Bank_CO2_RawData.tsv) to help me compute the CO2 (kt) emissions by region (grouping countries in the dataset by region first) in the year 2010 in a table, including percentages and also give me code for a bar chart showcasing this.
+The dataset does NOT contain a Region column. Create one in the code by assigning each country to its appropriate World Bank geographic region, the lists these fall under are Country Name and Country Code This data is from the World Bank Database on Carbon Emissions if you need reference: https://databank.worldbank.org/source/millennium-development-goals/Series/EN.ATM.CO2E.KT ",Claude,Sonnet 5.5 Medium,36s,"import pandas as pd
+import matplotlib.pyplot as plt
+
+# ------------------------------------------------------------------
+# 1. Load the data
+# ------------------------------------------------------------------
+df = pd.read_csv(""World_Bank_CO2_RawData.tsv"", sep=""\t"")
+df.columns = df.columns.str.strip()
+
+# Find the 2010 column (handles ""2010"" or ""2010 [YR2010]"")
+year_col = next(c for c in df.columns if c.startswith(""2010""))
+
+# World Bank files use "".."" for missing values -> convert to NaN
+df[year_col] = pd.to_numeric(df[year_col], errors=""coerce"")
+
+# ------------------------------------------------------------------
+# 2. World Bank region assignment (by ISO3 Country Code)
+# ------------------------------------------------------------------
+region_codes = {
+    ""East Asia & Pacific"": [
+        ""ASM"", ""AUS"", ""BRN"", ""KHM"", ""CHN"", ""FJI"", ""PYF"", ""GUM"", ""HKG"", ""IDN"",
+        ""JPN"", ""KIR"", ""PRK"", ""KOR"", ""LAO"", ""MAC"", ""MYS"", ""MHL"", ""FSM"", ""MNG"",
+        ""MMR"", ""NRU"", ""NCL"", ""NZL"", ""MNP"", ""PLW"", ""PNG"", ""PHL"", ""WSM"", ""SGP"",
+        ""SLB"", ""THA"", ""TLS"", ""TON"", ""TUV"", ""VUT"", ""VNM"",
+    ],
+    ""Europe & Central Asia"": [
+        ""ALB"", ""AND"", ""ARM"", ""AUT"", ""AZE"", ""BLR"", ""BEL"", ""BIH"", ""BGR"", ""CHI"",
+        ""HRV"", ""CYP"", ""CZE"", ""DNK"", ""EST"", ""FRO"", ""FIN"", ""FRA"", ""GEO"", ""DEU"",
+        ""GIB"", ""GRC"", ""GRL"", ""HUN"", ""ISL"", ""IRL"", ""IMN"", ""ITA"", ""KAZ"", ""XKX"",
+        ""KGZ"", ""LVA"", ""LIE"", ""LTU"", ""LUX"", ""MLT"", ""MDA"", ""MCO"", ""MNE"", ""NLD"",
+        ""MKD"", ""NOR"", ""POL"", ""PRT"", ""ROU"", ""RUS"", ""SMR"", ""SRB"", ""SVK"", ""SVN"",
+        ""ESP"", ""SWE"", ""CHE"", ""TJK"", ""TUR"", ""TKM"", ""UKR"", ""GBR"", ""UZB"",
+    ],
+    ""Latin America & Caribbean"": [
+        ""ATG"", ""ARG"", ""ABW"", ""BHS"", ""BRB"", ""BLZ"", ""BOL"", ""BRA"", ""VGB"", ""CYM"",
+        ""CHL"", ""COL"", ""CRI"", ""CUB"", ""CUW"", ""DMA"", ""DOM"", ""ECU"", ""SLV"", ""GRD"",
+        ""GTM"", ""GUY"", ""HTI"", ""HND"", ""JAM"", ""MEX"", ""NIC"", ""PAN"", ""PRY"", ""PER"",
+        ""PRI"", ""SXM"", ""KNA"", ""LCA"", ""MAF"", ""VCT"", ""SUR"", ""TTO"", ""TCA"", ""URY"",
+        ""VEN"", ""VIR"",
+    ],
+    ""Middle East & North Africa"": [
+        ""DZA"", ""BHR"", ""DJI"", ""EGY"", ""IRN"", ""IRQ"", ""ISR"", ""JOR"", ""KWT"", ""LBN"",
+        ""LBY"", ""MAR"", ""OMN"", ""QAT"", ""SAU"", ""SYR"", ""TUN"", ""ARE"", ""PSE"", ""YEM"",
+    ],
+    ""North America"": [""BMU"", ""CAN"", ""USA""],
+    ""South Asia"": [""AFG"", ""BGD"", ""BTN"", ""IND"", ""MDV"", ""NPL"", ""PAK"", ""LKA""],
+    ""Sub-Saharan Africa"": [
+        ""AGO"", ""BEN"", ""BWA"", ""BFA"", ""BDI"", ""CPV"", ""CMR"", ""CAF"", ""TCD"", ""COM"",
+        ""COD"", ""COG"", ""CIV"", ""GNQ"", ""ERI"", ""SWZ"", ""ETH"", ""GAB"", ""GMB"", ""GHA"",
+        ""GIN"", ""GNB"", ""KEN"", ""LSO"", ""LBR"", ""MDG"", ""MWI"", ""MLI"", ""MRT"", ""MUS"",
+        ""MOZ"", ""NAM"", ""NER"", ""NGA"", ""RWA"", ""STP"", ""SEN"", ""SYC"", ""SLE"", ""SOM"",
+        ""ZAF"", ""SSD"", ""SDN"", ""TZA"", ""TGO"", ""UGA"", ""ZMB"", ""ZWE"",
+    ],
+}
+
+# Invert to {country_code: region}
+code_to_region = {code: region
+                  for region, codes in region_codes.items()
+                  for code in codes}
+
+# Create the Region column
+df[""Region""] = df[""Country Code""].str.strip().map(code_to_region)
+
+# Rows with no region are aggregates (World, High income, etc.) or unmapped.
+# Drop them so they don't double count.
+unmapped = df[df[""Region""].isna()][""Country Name""].dropna().unique()
+print(""Excluded (aggregates / unmapped):"", list(unmapped), ""\n"")
+df = df.dropna(subset=[""Region""])
+
+# ------------------------------------------------------------------
+# 3. CO2 emissions by region in 2010
+# ------------------------------------------------------------------
+region_totals = (
+    df.groupby(""Region"")[year_col]
+      .sum(min_count=1)          # NaN-only groups stay NaN instead of 0
+      .sort_values(ascending=False)
+      .reset_index()
+)
+region_totals.columns = [""Region"", ""CO2 Emissions 2010 (kt)""]
+
+total = region_totals[""CO2 Emissions 2010 (kt)""].sum()
+region_totals[""Percentage of Total (%)""] = (
+    region_totals[""CO2 Emissions 2010 (kt)""] / total * 100
+).round(2)
+
+print(""CO2 Emissions by Region, 2010"")
+print(region_totals.to_string(index=False, formatters={
+    ""CO2 Emissions 2010 (kt)"": ""{:,.0f}"".format,
+    ""Percentage of Total (%)"": ""{:.2f}%"".format,
+}))
+print(f""\nTotal: {total:,.0f} kt"")
+
+# ------------------------------------------------------------------
+# 4. Bar chart
+# ------------------------------------------------------------------
+fig, ax = plt.subplots(figsize=(11, 6))
+bars = ax.bar(region_totals[""Region""],
+              region_totals[""CO2 Emissions 2010 (kt)""],
+              color=""steelblue"", edgecolor=""black"")
+
+# Label each bar with its percentage
+for bar, pct in zip(bars, region_totals[""Percentage of Total (%)""]):
+    ax.text(bar.get_x() + bar.get_width() / 2,
+            bar.get_height(),
+            f""{pct:.1f}%"",
+            ha=""center"", va=""bottom"", fontsize=10, fontweight=""bold"")
+
+ax.set_title(""CO2 Emissions by World Bank Region, 2010"", fontsize=14)
+ax.set_xlabel(""Region"")
+ax.set_ylabel(""CO2 Emissions (kt)"")
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f""{x:,.0f}""))
+plt.xticks(rotation=30, ha=""right"")
+plt.tight_layout()
+plt.savefig(""co2_by_region_2010.png"", dpi=300)
+plt.show()",correct,Claude told me specifically there was an aggregates table and it got rid of it. It was able to correctly calculate the percentages and also showed a very similar sum of CO2(kt) per region

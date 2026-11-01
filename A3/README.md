@@ -37,7 +37,25 @@ The notebook does not fetch external data. It loads two CSV files you create fro
 - I did use AI to help with coding this assignment. Check the 'Usage of AI' section below for a more detailed report
 
 
+# Responses 
 
+## 1. Your prior practice
+
+*How do you currently use LLMs in your own work, and what do you assume about their reliability? A few sentences.*
+
+I currently use LLMs to help with getting resources, such as for coding assignments, and also asking it questions about things I am confused about, such as reflecting on topics (for example, philosophy). For code, I assume that the responses they use will work or are accurate but sometimes the code it generates can be wrong and not what I want it to do. For questions, I don't believe it is reliable but helps me find information quicker than a search. I do try to identify in the output any parts that might not be true and fact checking it, but there may be times that I am not able to identify just by looking at the wording if what it said was true.
+
+## 2. Reproducibility Probe
+
+**What varied, and what held up?** *Summarize the divergence across runs and models, and how you verified each answer against ground truth.*
+
+To verify each run, I wrote my own code that shows a table and also a bar graph which uses a dataset that I cleaned up prior and then checked each value against the AI's response. 
+
+For run 1 and 3 with ChatGPT, it had the same exact outcome where it included an aggregates category which messed up the calculation for percentages and also had a 170k different for Middle East and North Africa when I verified it against my own data. 
+
+For run 2 with ChatGPT, I couldn't run it at all because it threw an error which meant I couldn't check. 
+
+For run 4 with Claude, it had the exact same percentage calculations as my own answer when I went to verify and basically the same sum for CO2 (kt). Based on this, what varied across runs was accuracy of the code and calculating the data and what held up was identifying and writing down each region in the table.
 
 # Checking_AI_Response.jpynb
 

@@ -27,14 +27,17 @@ Open `A3_watching_the_machine_starter.ipynb` and run the cells. The only depende
 The notebook does not fetch external data. It loads two CSV files you create from your own runs and field notes: `a3_runs.csv` and `a3_codes.csv`. Header-only templates of both are included in this folder; open them in Google Sheets or Excel, fill them in, download as CSV, and upload them here with the same names.
 
 ### Datasets:
-- **Data from: DataBank World CO2 Emissions**
+**Data from: DataBank World CO2 Emissions**
+- My Datasets/World_Bank_CO2_RawData.tsv : This dataset contains raw data from the source
+- My Datasets/World_Bank_CO2_Cleaned.tsv: This dataset contains cleaned data from the source
+  
 **Source:** https://databank.worldbank.org/metadataglossary/millennium-development-goals/series/EN.ATM.CO2E.KT
 **License / terms of use:** Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
 
 **How I cleaned the data:** I categorized each country in the dataset to a region in the world and examined CO2 Emissions from 1960 to 2010
 
 **AI Statement:** 
-- I did use AI to help with coding this assignment. Check the 'Usage of AI' section below for a more detailed report
+- I used AI to run the tests and also used it to help with coding and troubleshooting the verification code. Check the 'Usage of AI' section below for a more detailed report.
 
 
 # Responses 
@@ -47,6 +50,10 @@ I currently use LLMs to help with getting resources, such as for coding assignme
 
 ## 2. Reproducibility Probe
 
+### Prompt for LLMs:
+I want you to give me the full code that uses pandas (assuming I have it set up the file name to be World_Bank_CO2_RawData.tsv) to help me compute the CO2 (kt) emissions by region (grouping countries in the dataset by region first) in the year 2010 in a table, including percentages and also give me code for a bar chart showcasing this.
+The dataset does NOT contain a Region column. Create one in the code by assigning each country to its appropriate World Bank geographic region, the lists these fall under are Country Name and Country Code This data is from the World Bank Database on Carbon Emissions if you need reference: https://databank.worldbank.org/source/millennium-development-goals/Series/EN.ATM.CO2E.KT 
+
 **What varied, and what held up?** *Summarize the divergence across runs and models, and how you verified each answer against ground truth.*
 
 To verify each run, I wrote my own code that shows a table and also a bar graph which uses a dataset that I cleaned up prior and then checked each value against the AI's response. 
@@ -57,6 +64,39 @@ For run 2 with ChatGPT, I couldn't run it at all because it threw an error which
 
 For run 4 with Claude, it had the exact same percentage calculations as my own answer when I went to verify and basically the same sum for CO2 (kt). Based on this, what varied across runs was accuracy of the code and calculating the data and what held up was identifying and writing down each region in the table.
 
+## 3. Observation
+
+I tested with one participant who used ChatGPT (Unknown version) who input the same exact prompt used in part 2.
+
+### Field notes
+- **10:38** _Input the prompt, ChatGPT (Unknown Version) took 19 seconds, they said the output looks good_
+- **10:40** _After testing the code, they realized it didn't work so they went back to ask "the code doesn't seem to be working, could you revise it?", which took 12 seconds_
+- **10:41** _After asking if they trust the code, they said they do because the response at the end says "if this code doesn't work try this and run the output"_
+- **10:43** _They decided to test out the output test lines given by the AI by feeding it back into ChatGPT ("Could you run these three lines seperately tell if it looks good?")_
+- **10:43** _ChatGPT couldn't run it because it doesn't have the actual TSV file in the prompt_
+- **10:45** _They finally decided to check the actual code, realizing there was another error_
+- **10:45** _They pasted the error directly from the terminal and asked "I plugged this into Jupyter and it gave me an error? What's up with that"_
+- **10:46** _ChatGPT responded saying "no worries!" to reassure them but the output doesn't tell them why and they still don't understand why they are having errors_
+- **10:48** _I realized I had messed up the prompt file location and helped fix it so it ran the output_
+- **10:50** _After seeing the output, they were confused why the graph was showing a bar for aggregates and asked ChatGPT to specify "why aggregates is seperate from other regions?"_
+- **10:51** _After 11 seconds, ChatGPT gave a new output explaining it as combined statistics from the file but they were still confused what it meant_
+- **10:53** _They looked back at the original prompt to remind themselves what they're supposed to look for in the output as they felt they were doing something wrong instead of ChatGPT_
+- **10:56** _They finally asked ChatGPT "Can you not include aggregates and just do it by regions?", and the output took 20 seconds_
+- **10:56** _They immediately trusted the code without verifying at first but then realized the formatting was wrong and decided to ask ChatGPT to turn the output into .txt but the output included extra headers instead. They said this was not what they wanted_
+- **11:03** _After troubleshooting, they told ChatGPT that they wanted the original revised code from earlier again_
+- **11:05** _The code given by ChatGPT was still having an issue passing the code, and they began to actually read the code to see what was happening but couldn't fully understand_
+- **11:07** _They made a typo during the prompt_
+- **11:12** _They gave ChatGPT the whole error given and asked it to revise, they were feeling confident that the code was going to work_
+- **11:13** _After pasting the new code, they noticed that South America, North Africa, and other important regions were missing_
+- **11:16** _They asked ChatGPT "Can you include the missing regions? Like South America and Africa or Australia"_
+- **11:16** _ChatGPT gave an explanation of the regions and proposed 12 regions to include in the code, which they asked ChatGPT to include_
+- **11:17** _They said they were getting frustrated with the AI and after 30 seconds, ChatGPT gave a new code output_
+- **11:18** _They looked at the result and said they were happy and looks acceptable, I asked if they trusted it and they decided to ask ChatGPT to check and verify with sources"_
+- **11:18** _It took ChatGPT 35 seconds and said it was correct, so they felt they trusted the output_
+- **11:20** _After running the code, they didn't see any errors by checking the categories but didn't actually check to compare the values were correct_
+- **11:21** _They felt that ChatGPT made it feel easy to make the code and told me that ChatGPT could do my initial code to verify the outputs faster_
+- **11:22** _They compared my bar chart's layout to their output and felt that they AI layout one was easier to digest for them._
+
 # Checking_AI_Response.jpynb
 
 This notebook was created to check if the responses AI gave me were correct based on the DataBank_World_CO2_Emissions_kt.tsv file
@@ -64,6 +104,8 @@ This notebook was created to check if the responses AI gave me were correct base
 
 # Usage of AI
 
+# 2 - 3
+AI was used only based on the prompt guidelines.
 
 ## Checking_AI_Response.jpynb
 

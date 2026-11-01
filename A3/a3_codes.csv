@@ -1,1 +1,28 @@
-observation,theme
+"observation	
+",theme
+"Input the prompt, ChatGPT (Unknown Version) took 19 seconds, they said the output looks good",over-trust
+"After testing the code, they realized it didn't work so they went back to ask ""the code doesn't seem to be working, could you revise it?"", which took 12 seconds",prompt repair
+"After asking if they trust the code, they said they do because the response at the end says ""if this code doesn't work try this and run the output""",over-trust
+"They decided to test out the output test lines given by the AI by feeding it back into ChatGPT instead of checking themselves(""Could you run these three lines seperately tell if it looks good?"")",skipped verification
+"They finally decided to check the actual code, realizing there was another error",checking
+"They pasted the error directly from the terminal and asked ""I plugged this into Jupyter and it gave me an error? What's up with that""",prompt repair
+"ChatGPT responded saying ""no worries!"" to reassure them but the output doesn't tell them why and they still don't understand why they are having errors",confusion
+"After seeing the output, they were confused why the graph was showing a bar for aggregates and asked ChatGPT to specify ""why aggregates is seperate from other regions?""",checking
+"After 11 seconds, ChatGPT gave a new output explaining it as combined statistics from the file but they were still confused what it meant",confusion
+They looked back at the original prompt to remind themselves what they're supposed to look for in the output as they felt they were doing something wrong instead of ChatGPT,checking
+"They finally asked ChatGPT ""Can you not include aggregates and just do it by regions?""",prompt repair
+They immediately trusted the code without verifying at first,over-trust
+ but then realized the formatting was wrong and decided to ask ChatGPT to turn the output into .txt but the output included extra headers instead.,checking
+They said this was not what they wanted,frustration
+"After troubleshooting, they told ChatGPT that they wanted the original revised code from earlier again",prompt repair
+"The code given by ChatGPT was still having an issue passing the code, and they began to actually read the code to see what was happening but couldn't fully understand",checking
+They made a typo during the prompt,user error
+"They gave ChatGPT the whole error given and asked it to revise, they were feeling confident that the code was going to work",prompt repair
+"After pasting the new code, they noticed that South America, North Africa, and other important regions were missing",checking
+"They asked ChatGPT ""Can you include the missing regions? Like South America and Africa or Australia""",prompt repair
+"ChatGPT gave an explanation of the regions and proposed 12 regions to include in the code, which they asked ChatGPT to include",prompt repair
+"They said they were getting frustrated with the AI and after 30 seconds, ChatGPT gave a new code output",frustration
+"They looked at the result and said they were happy and looks acceptable, I asked if they trusted it and they decided to ask ChatGPT to ""check and verify with sources""",over-trust
+"It took ChatGPT 35 seconds and said it was correct, so they felt they trusted the output",over-trust
+"After running the code, they didn't see any errors by checking the categories but didn't actually check to compare the values were correct",skipped verification
+They felt that ChatGPT made it feel easy to make the code and told me that ChatGPT could do my initial code to verify the outputs faster,over-trust

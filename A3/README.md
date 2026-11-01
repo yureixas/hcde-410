@@ -26,6 +26,45 @@ Open `A3_watching_the_machine_starter.ipynb` and run the cells. The only depende
 
 The notebook does not fetch external data. It loads two CSV files you create from your own runs and field notes: `a3_runs.csv` and `a3_codes.csv`. Header-only templates of both are included in this folder; open them in Google Sheets or Excel, fill them in, download as CSV, and upload them here with the same names.
 
+### Datasets:
+- **Data from: DataBank World CO2 Emissions**
+**Source:** https://databank.worldbank.org/metadataglossary/millennium-development-goals/series/EN.ATM.CO2E.KT
+**License / terms of use:** Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+**How I cleaned the data:** I categorized each country in the dataset to a region in the world and examined CO2 Emissions from 1960 to 2010
+
+**AI Statement:** 
+- I did use AI to help with coding this assignment. Check the 'Usage of AI' section below for a more detailed report
+
+
+
+
+# Checking_AI_Response.jpynb
+
+This notebook was created to check if the responses AI gave me were correct based on the DataBank_World_CO2_Emissions_kt.tsv file
+
+
+# Usage of AI
+
+
+## Checking_AI_Response.jpynb
+
+**AI prompt**: How do I make a data frame in panda only resspond to a year and then format the value from 'CO2 (kt)' to not be a string and instead a number
+
+**AI Response**:
+```
+# Filter for 2010
+df_2010 = df[df["Year"] == "2010"].copy()
+
+# Convert CO2 values from strings to numbers
+df_2010["CO2 (kt)"] = pd.to_numeric(
+    df_2010["CO2 (kt)"].str.replace(",", ""),
+    errors="coerce"
+)
+```
+**What I did:** I used this code to help me change the values from the CO2 (kt) column from strings to numerical values so that I could sum it later 
+
+
 ## License
 
 Released under the MIT License — see [`LICENSE`](./LICENSE).
